@@ -6,12 +6,10 @@ import NotFound from "./components/NotFound";
 import PlayerPage from "./components/player-page";
 import { useStoreState } from "easy-peasy";
 
-
 function App() {
-  const { data } = useStoreState((state) => state.playlists);
-  
+  const { data: playlists } = useStoreState((state) => state.playlists);
 
-  const playlistArrays = Object.values(data);
+  const playlistArrays = Object.values(playlists);
 
   return (
     <>
@@ -20,10 +18,10 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<Home playlistArrays={playlistArrays} />} />
-          {/* <Route
+          <Route
             path="/player/:playlistId"
             element={<PlayerPage playlists={playlists} />}
-          /> */}
+          />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

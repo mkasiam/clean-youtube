@@ -16,8 +16,8 @@ const PlaylistCardItem = ({
   return (
     <Card
       sx={{
-        height: "100%",
-        maxWidth: 345,
+        height: 400,
+        width: 345,
         display: "flex",
         flexDirection: "column",
         margin: 1,
@@ -27,20 +27,40 @@ const PlaylistCardItem = ({
         component="img"
         image={playlistThumbnail.url}
         alt={playlistTitle}
+        sx={{ height: 200, objectFit: "cover" }}
       />
-      <CardContent>
-        <Typography variant="h6" sx={{ color: "text.primary" }}>
-          {playlistTitle.length > 50
-            ? `${playlistTitle.slice(0, 50)}...`
-            : playlistTitle}
+      <CardContent sx={{ flexGrow: 1, overflow: "hidden" }}>
+        <Typography 
+          variant="h6" 
+          sx={{ 
+            color: "text.primary",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+            minHeight: 60
+          }}
+        >
+          {playlistTitle}
         </Typography>
 
-        <Typography variant="h6" sx={{ color: "text.secondary" }}>
+        <Typography 
+          variant="h6" 
+          sx={{ 
+            color: "text.secondary",
+            display: "-webkit-box",
+            WebkitLineClamp: 1,
+            WebkitBoxOrient: "vertical",
+            fontSize:"14px",
+            fontWeight:"500",
+            overflow: "hidden",
+            minHeight: 30
+          }}
+        >
           {channelTitle}
         </Typography>
       </CardContent>
-      <Box sx={{ flexGrow: 1 }}></Box>
-      <CardActions disableSpacing>
+      <CardActions disableSpacing >
         <Link to={`/player/${playlistId}`}>
           <Button startIcon={<PlayCircleOutline />}>Start Tutorial</Button>
         </Link>
