@@ -2,12 +2,6 @@ import { Container, Grid } from "@mui/material";
 import PlaylistCardItem from "../playlist-card-item";
 
 const Home = ({ playlistArrays }) => {
-//   const playlists = useStoreActions((state) => state.playlists);
-
-//   useEffect(() => {
-//     playlists.getPlaylistData(playlistId);
-//   }, []);
-
   return (
     <Container maxWidth="lg" sx={{ my: 16 }}>
       {playlistArrays.length > 0 && (

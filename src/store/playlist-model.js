@@ -28,7 +28,7 @@ const playlistModel = persist({
         e?.response?.data?.error?.message || "Something Went Wrong!",
       );
     } finally {
-      actions.isLoading(false);
+      actions.setLoading(false);
     }
   }),
 });

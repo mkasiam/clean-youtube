@@ -1,4 +1,3 @@
-import usePlaylist from "./hooks/usePlaylist";
 import CssBaseline from "@mui/material/CssBaseline";
 import Navbar from "./components/navbar";
 import { BrowserRouter, Route, Routes } from "react-router";
@@ -7,10 +6,10 @@ import NotFound from "./components/NotFound";
 import PlayerPage from "./components/player-page";
 import { useStoreState } from "easy-peasy";
 
-const playlistId = "PLWc1yfTYfqNGG8W9ypCzYjz6WsuNBEfe8";
 
 function App() {
   const { data } = useStoreState((state) => state.playlists);
+  
 
   const playlistArrays = Object.values(data);
 

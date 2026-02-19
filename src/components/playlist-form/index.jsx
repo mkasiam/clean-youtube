@@ -6,17 +6,22 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useState } from "react";
+import { useStoreActions } from "easy-peasy";
 
-const PlaylistForm = ({ open, handleClose, getPlaylistId }) => {
+const PlaylistForm = ({ open, handleClose }) => {
   const [state, setState] = useState("");
 
-  const handleSubmit = (e) => {
+  const getPlaylistData = useStoreActions(
+    (actions) => actions.playlists.getPlaylistData,
+  );
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     //TODO: handle url later
     if (!state) {
       alert("Invalid State");
     } else {
-      getPlaylistId(state);
+      await getPlaylistData(state);
       setState(" ");
       handleClose();
     }
