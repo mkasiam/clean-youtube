@@ -2,15 +2,11 @@ import {
   Container,
   Typography,
   Grid,
-  Card,
   CardMedia,
-  CardContent,
   Box,
   Avatar,
-  Chip,
 } from "@mui/material";
 import { useParams } from "react-router";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PlaylistItem from "./playlist-item";
 
 const PlayerPage = ({ playlists }) => {
@@ -20,6 +16,7 @@ const PlayerPage = ({ playlists }) => {
   if (!currentPlaylist) return <Typography>Playlist not found</Typography>;
 
   const {
+    playlistId: currentPlaylistId,
     channelTitle,
     playlistTitle,
     playlistDescription,
@@ -83,7 +80,12 @@ const PlayerPage = ({ playlists }) => {
         }}
       >
         {playlistItems.map((item, index) => (
-          <PlaylistItem key={item.videoId} item={item} index={index} />
+          <PlaylistItem
+            key={item.videoId}
+            item={item}
+            index={index}
+            currentPlaylistId={currentPlaylistId}
+          />
         ))}
       </Grid>
     </Container>

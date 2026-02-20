@@ -10,11 +10,11 @@ import {
 } from "@mui/material";
 import { Link as RouterLink } from "react-router";
 
-const PlaylistItem = ({ item, index }) => {
+const PlaylistItem = ({ item, index, currentPlaylistId }) => {
   return (
     <Grid item xs={12}>
       <Link
-        to={`/player/v/${item.videoId}`}
+        to={`/player/${currentPlaylistId}/${item.videoId}`}
         component={RouterLink}
         sx={{ textDecoration: "none" }}
       >

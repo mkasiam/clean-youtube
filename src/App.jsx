@@ -23,7 +23,7 @@ function App() {
             path="/player/:playlistId"
             element={<PlayerPage playlists={playlists} />}
           />
-          <Route path="/player/v/:videoId" element={<VideoItem />} />
+          <Route path="/player/:playlistId/:videoId" element={<VideoItem />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
