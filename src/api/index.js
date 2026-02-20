@@ -35,10 +35,12 @@ const getPlaylist = async (playlistId) => {
       title,
       description: videoDescription,
       thumbnails: { medium },
+      resourceId: { videoId },
     } = item.snippet;
 
     return {
       title,
+      videoId,
       videoDescription,
       thumbnail: medium,
     };
@@ -49,7 +51,7 @@ const getPlaylist = async (playlistId) => {
     playlistTitle,
     playlistDescription,
     channelId,
-    playlistThumbnail: thumbnails.default,
+    playlistThumbnail: thumbnails.high,
     channelTitle,
     playlistItems,
   };

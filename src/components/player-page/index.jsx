@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { useParams } from "react-router";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import PlaylistItem from "./playlist-item";
 
 const PlayerPage = ({ playlists }) => {
   const { playlistId } = useParams();
@@ -32,24 +33,27 @@ const PlayerPage = ({ playlists }) => {
       sx={{
         display: "flex",
         justifyContent: "space-between",
-        // alignItems: "center",
         mt: 16,
         mb: 4,
       }}
     >
       {/* Header Section */}
-      <Box sx={{ mb: 4 }}>
+      <Box sx={{ mb: 4, flex: 1, padding: 2 }}>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={4}>
             <CardMedia
               component="img"
               image={playlistThumbnail.url}
               alt={playlistTitle}
-              sx={{ borderRadius: 2, height: 250, objectFit: "cover" }}
+              sx={{
+                borderRadius: 2,
+                height: 250,
+                objectFit: "cover",
+              }}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={8}>
-            <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1 }}>
+            <Typography variant="h6" sx={{ fontWeight: "bold", my: 1 }}>
               {playlistTitle}
             </Typography>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
@@ -69,38 +73,17 @@ const PlayerPage = ({ playlists }) => {
       </Box>
 
       {/* Playlist Items */}
-      <Grid container spacing={2}>
+      <Grid
+        container
+        spacing={2}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          flex: 2,
+        }}
+      >
         {playlistItems.map((item, index) => (
-          <Grid item xs={12} key={item.id}>
-            <Card sx={{ display: "flex", "&:hover": { bgcolor: "#f1e7e7" } }}>
-              <CardMedia
-                component="img"
-                image={item.thumbnail.url}
-                alt={item.title}
-                sx={{ width: 200, height: 112, objectFit: "cover" }}
-              />
-              <CardContent
-                sx={{
-                  flex: 1,
-                  display: "flex",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Box>
-                  <Chip label={index + 1} size="small" sx={{ mr: 1 }} />
-                  <Typography variant="subtitle1" sx={{ fontWeight: "500" }}>
-                    {item.title}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: "text.secondary" }}
-                  >
-                    {item.channelTitle}
-                  </Typography>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
+          <PlaylistItem key={item.videoId} item={item} index={index} />
         ))}
       </Grid>
     </Container>

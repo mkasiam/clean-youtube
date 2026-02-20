@@ -4,7 +4,7 @@ import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
 import Typography from "@mui/material/Typography";
 import { PlayCircleOutline } from "@mui/icons-material";
-import { Box, Button } from "@mui/material";
+import { Button } from "@mui/material";
 import { Link } from "react-router";
 
 const PlaylistCardItem = ({
@@ -30,37 +30,37 @@ const PlaylistCardItem = ({
         sx={{ height: 200, objectFit: "cover" }}
       />
       <CardContent sx={{ flexGrow: 1, overflow: "hidden" }}>
-        <Typography 
-          variant="h6" 
-          sx={{ 
+        <Typography
+          variant="h6"
+          sx={{
             color: "text.primary",
             display: "-webkit-box",
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
             overflow: "hidden",
-            minHeight: 60
+            minHeight: 60,
           }}
         >
           {playlistTitle}
         </Typography>
 
-        <Typography 
-          variant="h6" 
-          sx={{ 
+        <Typography
+          variant="h6"
+          sx={{
             color: "text.secondary",
             display: "-webkit-box",
             WebkitLineClamp: 1,
             WebkitBoxOrient: "vertical",
-            fontSize:"14px",
-            fontWeight:"500",
+            fontSize: "14px",
+            fontWeight: "500",
             overflow: "hidden",
-            minHeight: 30
+            minHeight: 30,
           }}
         >
           {channelTitle}
         </Typography>
       </CardContent>
-      <CardActions disableSpacing >
+      <CardActions disableSpacing>
         <Link to={`/player/${playlistId}`}>
           <Button startIcon={<PlayCircleOutline />}>Start Tutorial</Button>
         </Link>
