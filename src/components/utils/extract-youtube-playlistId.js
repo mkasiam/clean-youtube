@@ -1,4 +1,4 @@
-export const extractingPlaylistId = (youtubeLink) => {
+export const extractYoutubePlaylistId = (youtubeLink) => {
   const searchWord = /list=(.*)/;
   const match = youtubeLink.match(searchWord);
 

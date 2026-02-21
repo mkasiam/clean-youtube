@@ -7,7 +7,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useState } from "react";
 import { useStoreActions } from "easy-peasy";
-import { extractingPlaylistId } from "../utils/extracting-playlistId";
+import { extractYoutubePlaylistId } from "../utils/extract-youtube-playlistId";
 
 const PlaylistForm = ({ open, handleClose }) => {
   const [state, setState] = useState("");
@@ -21,7 +21,7 @@ const PlaylistForm = ({ open, handleClose }) => {
 
     let playlistId = state;
     if (state.match(/youtube.com(.*)/)) {
-      playlistId = extractingPlaylistId(state);
+      playlistId = extractYoutubePlaylistId(state);
     }
 
     if (!playlistId) {
