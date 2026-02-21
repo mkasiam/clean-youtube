@@ -6,6 +6,7 @@ import NotFound from "./components/NotFound";
 import PlayerPage from "./components/player-page";
 import { useStoreState } from "easy-peasy";
 import VideoItem from "./components/player-page/video-item";
+import PlaylistDescription from "./components/player-page/playlist-description";
 
 function App() {
   const { data: playlists } = useStoreState((state) => state.playlists);
@@ -20,10 +21,12 @@ function App() {
         <Routes>
           <Route path="/" element={<Home playlistArrays={playlistArrays} />} />
           <Route
-            path="/player/:playlistId"
+            path="player/:playlistId"
             element={<PlayerPage playlists={playlists} />}
-          />
-          <Route path="/player/:playlistId/:videoId" element={<VideoItem />} />
+          >
+            <Route index element={<PlaylistDescription />} />
+            <Route path=":videoId" element={<VideoItem />} />
+          </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
