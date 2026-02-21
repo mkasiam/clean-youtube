@@ -11,7 +11,7 @@ const PlaylistDescription = () => {
   } = useOutletContext();
 
   return (
-    <Box sx={{ mb: 4, padding: 2 }}>
+    <Box sx={{ mb: 4, flex: 1, padding: 2 }}>
       <Grid container spacing={3}>
         <Grid item xs={12} sm={6} md={4}>
           <CardMedia
@@ -20,7 +20,6 @@ const PlaylistDescription = () => {
             alt={playlistTitle}
             sx={{
               borderRadius: 2,
-              height: 250,
               objectFit: "cover",
             }}
           />

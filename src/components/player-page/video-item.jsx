@@ -7,7 +7,6 @@ const VideoItem = () => {
 
   return (
     <Box sx={{ padding: 2 }}>
-      <h1>Video is coming soon...</h1>
       <Box
         sx={{
           position: "relative",

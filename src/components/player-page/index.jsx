@@ -1,9 +1,9 @@
 import { Container, Typography, Grid, Box } from "@mui/material";
 import { Outlet, useParams } from "react-router";
-import PlaylistItem from "./playlist-item";
+import PlaylistItems from "./playlist-items";
 
 const PlayerPage = ({ playlists }) => {
-  const { playlistId } = useParams();
+  const { playlistId, videoId } = useParams();
   const currentPlaylist = playlists[playlistId];
 
   if (!currentPlaylist) return <Typography>Playlist not found</Typography>;
@@ -17,6 +17,8 @@ const PlayerPage = ({ playlists }) => {
     playlistItems = [],
   } = currentPlaylist;
 
+  const isVideoRoute = Boolean(videoId);
+
   return (
     <Container
       maxWidth="lg"
@@ -29,7 +31,15 @@ const PlayerPage = ({ playlists }) => {
         mb: 4,
       }}
     >
-      <Box sx={{ flex: { xs: "1 1 100%", md: 1 } }}>
+      <Box
+        sx={{
+          flex: {
+            xs: "1 1 100%",
+            md: isVideoRoute ? "2 1 0%" : "1 1 0%",
+          },
+          minWidth: 0,
+        }}
+      >
         <Outlet
           context={{
             channelTitle,
@@ -42,7 +52,19 @@ const PlayerPage = ({ playlists }) => {
       </Box>
 
       {/* Playlist Items */}
-      <Box sx={{ flex: { xs: "1 1 100%", md: 2 } }}>
+      <Box
+        sx={{
+          flex: {
+            xs: "1 1 100%",
+            md: isVideoRoute ? "1 1 0%" : "2 1 0%",
+          },
+          alignSelf: { xs: "stretch", md: "flex-start" },
+          height: { xs: "auto", md: "calc(100vh - 88px)" },
+          overflowY: { xs: "visible", md: "auto" },
+          paddingRight: { xs: 0, md: 1 },
+          minWidth: 0,
+        }}
+      >
         <Grid
           container
           spacing={2}
@@ -52,11 +74,14 @@ const PlayerPage = ({ playlists }) => {
           }}
         >
           {playlistItems.map((item, index) => (
-            <PlaylistItem
+            <PlaylistItems
               key={item.videoId}
               item={item}
               index={index}
               currentPlaylistId={currentPlaylistId}
+              channelTitle={channelTitle}
+              compact={isVideoRoute}
+              active={item.videoId === videoId}
             />
           ))}
         </Grid>

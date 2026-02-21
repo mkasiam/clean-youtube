@@ -7,6 +7,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useState } from "react";
 import { useStoreActions } from "easy-peasy";
+import { extractingPlaylistId } from "../utils/extracting-playlistId";
 
 const PlaylistForm = ({ open, handleClose }) => {
   const [state, setState] = useState("");
@@ -17,11 +18,16 @@ const PlaylistForm = ({ open, handleClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    //TODO: handle url later
-    if (!state) {
-      alert("Invalid State");
+
+    let playlistId = state;
+    if (state.match(/youtube.com(.*)/)) {
+      playlistId = extractingPlaylistId(state);
+    }
+
+    if (!playlistId) {
+      alert("Invalid Youtube Playlist Link");
     } else {
-      await getPlaylistData(state);
+      await getPlaylistData(playlistId);
       setState(" ");
       handleClose();
     }
@@ -40,7 +46,7 @@ const PlaylistForm = ({ open, handleClose }) => {
               autoFocus
               required
               margin="dense"
-              label="Playlist ID or Link"
+              label="Playlist ID or Link Includes Playlist"
               fullWidth
               variant="standard"
               onChange={(e) => setState(e.target.value)}
