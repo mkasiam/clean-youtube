@@ -27,9 +27,9 @@ const PlaylistForm = ({ open, handleClose }) => {
     if (!playlistId) {
       alert("Invalid Youtube Playlist Link");
     } else {
-      await getPlaylistData(playlistId);
       setState(" ");
       handleClose();
+      await getPlaylistData(playlistId);
     }
   };
 

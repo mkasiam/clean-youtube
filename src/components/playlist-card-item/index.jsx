@@ -4,8 +4,11 @@ import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
 import Typography from "@mui/material/Typography";
 import { PlayCircleOutline } from "@mui/icons-material";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import { Button } from "@mui/material";
 import { Link } from "react-router";
+import { useStoreActions, useStoreState } from "easy-peasy";
 
 const PlaylistCardItem = ({
   playlistId,
@@ -13,6 +16,12 @@ const PlaylistCardItem = ({
   playlistTitle,
   channelTitle,
 }) => {
+  const addToRecent = useStoreActions((actions) => actions.recents.addToRecent);
+  const favoritesActions = useStoreActions((actions) => actions.favorites);
+  const favorites = useStoreState((state) => state.favorites.items);
+
+  const isFavorite = favorites.includes(playlistId);
+
   return (
     <Card
       sx={{
@@ -60,10 +69,25 @@ const PlaylistCardItem = ({
           {channelTitle}
         </Typography>
       </CardContent>
-      <CardActions disableSpacing>
+
+      <CardActions sx={{ display: "flex", justifyContent: "space-between" }}>
         <Link to={`/player/${playlistId}`}>
-          <Button startIcon={<PlayCircleOutline />}>Start Tutorial</Button>
+          <Button
+            onClick={() => addToRecent(playlistId)}
+            startIcon={<PlayCircleOutline />}
+          >
+            Start Tutorial
+          </Button>
         </Link>
+
+        <Button
+          onClick={() =>
+            isFavorite
+              ? favoritesActions.removeFromFavorite(playlistId)
+              : favoritesActions.addToFavorite(playlistId)
+          }
+          startIcon={isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+        ></Button>
       </CardActions>
     </Card>
   );

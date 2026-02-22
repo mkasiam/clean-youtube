@@ -1,40 +1,37 @@
-import { Container, Grid } from "@mui/material";
-import PlaylistCardItem from "../playlist-card-item";
+import { useStoreState } from "easy-peasy";
+import Playlists from "./playlists";
+import { Container } from "@mui/material";
 
-const Home = ({ playlistArrays }) => {
+const HomeLayout = () => {
+  const playlists = useStoreState((state) => state.playlists.data);
+  const recentPlaylistIds = useStoreState((state) => state.recents.items);
+  const favoritePlaylistIds = useStoreState((state) => state.favorites.items);
+
+  const playlistArray = Object.values(playlists);
+  const recentPlaylistsArray = recentPlaylistIds.map(
+    (playlistId) => playlists[playlistId],
+  );
+  const favoritePlaylistsArray = favoritePlaylistIds.map(
+    (playlistId) => playlists[playlistId],
+  );
+
   return (
-    <Container maxWidth="lg" sx={{ my: { xs: 3, sm: 6, md: 14, lg: 18 } }}>
-      {playlistArrays.length > 0 && (
-        <Grid
-          container
-          spacing={{ xs: 1.5, sm: 2, md: 3, lg: 4 }}
-          sx={{ alignItems: "stretch" }}
-        >
-          {playlistArrays?.map((playlist) => (
-            <Grid
-              item
-              key={playlist.playlistId}
-              xs={12} // 1 column on mobile
-              sm={6} // 2 columns on tablet
-              md={6} // 2 columns on medium
-              lg={4} // 3 columns on large
-              xl={3} // 4 columns on XL screens
-              sx={{
-                display: "flex",
-              }}
-            >
-              <PlaylistCardItem
-                playlistId={playlist.playlistId}
-                playlistThumbnail={playlist.playlistThumbnail}
-                playlistTitle={playlist.playlistTitle}
-                channelTitle={playlist.channelTitle}
-              />
-            </Grid>
-          ))}
-        </Grid>
+    <Container maxWidth="lg" sx={{ my: { xs: 3, sm: 6, md: 14, lg: 16 } }}>
+      {recentPlaylistsArray.length > 0 && (
+        <Playlists
+          playlistArrays={recentPlaylistsArray}
+          recent={true}
+        ></Playlists>
       )}
+      {favoritePlaylistsArray.length > 0 && (
+        <Playlists
+          playlistArrays={favoritePlaylistsArray}
+          favorite={true}
+        ></Playlists>
+      )}
+      <Playlists playlistArrays={playlistArray}></Playlists>
     </Container>
   );
 };
 
-export default Home;
+export default HomeLayout;
