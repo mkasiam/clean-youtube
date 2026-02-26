@@ -40,6 +40,13 @@ const PlayerPage = ({ playlists }) => {
   };
 
   const toggleSidebar = () => {
+    if (togglePlaylistItems) {
+      window.scrollBy({
+        top: 150,
+        left: 0,
+        behavior: "smooth",
+      });
+    }
     setTogglePlaylistItems(!togglePlaylistItems);
   };
 
