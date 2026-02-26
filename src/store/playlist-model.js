@@ -9,6 +9,12 @@ const playlistModel = persist(
     addPlaylist: action((state, payload) => {
       state.data[payload.playlistId] = payload;
     }),
+    removePlaylist: action((state, payload) => {
+      if (!state.data[payload]) {
+        return;
+      }
+      delete state.data[payload];
+    }),
     setLoading: action((state, payload) => {
       state.isLoading = payload;
     }),
@@ -17,6 +23,7 @@ const playlistModel = persist(
     }),
     getPlaylistData: thunk(async (actions, payload, helpers) => {
       if (helpers.getState().data[payload]) {
+        actions.setError("Playlist Already Exists");
         return;
       }
 
@@ -24,6 +31,7 @@ const playlistModel = persist(
       try {
         const playlist = await getPlaylist(payload);
         actions.addPlaylist(playlist);
+        actions.setError("");
       } catch (e) {
         actions.setError(
           e?.response?.data?.error?.message || "Something Went Wrong!",

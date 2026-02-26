@@ -5,16 +5,20 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { useState } from "react";
-import { useStoreActions } from "easy-peasy";
+import { useEffect, useState } from "react";
+import { useStoreActions, useStoreState } from "easy-peasy";
 import { extractYoutubePlaylistId } from "../utils/extract-youtube-playlistId";
+import { CircularProgress, Snackbar, Alert } from "@mui/material";
 
 const PlaylistForm = ({ open, handleClose }) => {
   const [state, setState] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
-  const getPlaylistData = useStoreActions(
-    (actions) => actions.playlists.getPlaylistData,
+  const { getPlaylistData, setError } = useStoreActions(
+    (actions) => actions.playlists,
   );
+  const { error, isLoading, data } = useStoreState((state) => state.playlists);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,11 +29,23 @@ const PlaylistForm = ({ open, handleClose }) => {
     }
 
     if (!playlistId) {
-      alert("Invalid Youtube Playlist Link");
-    } else {
-      setState(" ");
-      handleClose();
-      await getPlaylistData(playlistId);
+      setError("Invalid Youtube Playlist Link");
+      setOpenSnackbar(true);
+      return;
+    }
+
+    await getPlaylistData(playlistId);
+    setState("");
+    if (data[playlistId]) {
+      setSuccessMessage("Playlist added successfully!");
+    }
+    setOpenSnackbar(true);
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+    if (!successMessage) {
+      setError("");
     }
   };
 
@@ -50,16 +66,34 @@ const PlaylistForm = ({ open, handleClose }) => {
               fullWidth
               variant="standard"
               onChange={(e) => setState(e.target.value)}
+              disabled={isLoading}
             />
           </form>
+          {isLoading && <CircularProgress />}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit" form="subscription-form">
+          <Button onClick={handleClose} disabled={isLoading}>
+            Cancel
+          </Button>
+          <Button type="submit" form="subscription-form" disabled={isLoading}>
             Add Playlist
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={openSnackbar || !!error || !!successMessage}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={successMessage ? "success" : "error"}
+          sx={{ width: "100%" }}
+        >
+          {successMessage || error}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

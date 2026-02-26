@@ -14,31 +14,25 @@ const Playlists = ({
         sx={{ fontWeight: 600, mb: 1, ml: 1 }}
       >
         {recent
-          ? "Recent Playlists:"
+          ? `Recent Playlists `
           : favorite
-            ? "Favorite Playlists:"
-            : "Playlists:"}
+            ? `Favorite Playlists `
+            : `Playlists `}
+        ({playlistArrays.length})
       </Typography>
 
       {playlistArrays.length > 0 && (
         <Grid
           container
-          spacing={{ xs: 1.5, sm: 2, md: 3, lg: 4 }}
-          sx={{ alignItems: "stretch" }}
+          spacing={1}
+          sx={{
+            display: "flex",
+            alignItems: "stretch",
+            justifyContent: "flex-start",
+          }}
         >
           {playlistArrays?.map((playlist) => (
-            <Grid
-              item
-              key={playlist.playlistId}
-              xs={12} // 1 column on mobile
-              sm={6} // 2 columns on tablet
-              md={6} // 2 columns on medium
-              lg={4} // 3 columns on large
-              xl={3} // 4 columns on XL screens
-              sx={{
-                display: "flex",
-              }}
-            >
+            <Grid item xs={12} sm={6} md={4} lg={3} key={playlist.playlistId}>
               <PlaylistCardItem
                 playlistId={playlist.playlistId}
                 playlistThumbnail={playlist.playlistThumbnail}
