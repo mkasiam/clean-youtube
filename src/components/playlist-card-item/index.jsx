@@ -7,9 +7,20 @@ import { PlayCircleOutline } from "@mui/icons-material";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import { Box, Button } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import { Link } from "react-router";
 import { useStoreActions, useStoreState } from "easy-peasy";
+import { useState } from "react";
 
 const PlaylistCardItem = ({
   playlistId,
@@ -17,7 +28,11 @@ const PlaylistCardItem = ({
   playlistTitle,
   channelTitle,
 }) => {
-  // Actions 
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
+
+  // Actions
   const recentActions = useStoreActions((actions) => actions.recents);
   const favoritesActions = useStoreActions((actions) => actions.favorites);
   const playlistActions = useStoreActions((actions) => actions.playlists);
@@ -106,10 +121,37 @@ const PlaylistCardItem = ({
         </Link>
 
         <Button
-          onClick={handleDeletePlaylist}
+          onClick={() => setDialogOpen(true)}
           startIcon={<DeleteOutlineIcon />}
         ></Button>
       </CardActions>
+
+      {/* Dialog Model For delete  */}
+      <Dialog
+        fullScreen={fullScreen}
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        aria-labelledby="responsive-dialog-title"
+      >
+        <DialogTitle id="responsive-dialog-title">
+          {"Are You Sure to Delete This Playlist?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            If you are sure to delete this playlist, click on Delete, Otherwise
+            click on Cancel.
+          </DialogContentText>
+        </DialogContent>
+
+        <DialogActions>
+          <Button autoFocus onClick={() => setDialogOpen(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleDeletePlaylist} autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Card>
   );
 };

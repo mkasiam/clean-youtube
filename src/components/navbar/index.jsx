@@ -23,7 +23,7 @@ const Navbar = () => {
   };
 
   return (
-    <Box sx={{ flexGrow: 1, mb: 16 }}>
+    <Box sx={{ flexGrow: 1, mb: 14 }}>
       <AppBar position="fixed" color="default" sx={{ py: 2 }}>
         <Container maxWidth="lg">
           <Toolbar>
@@ -37,15 +37,6 @@ const Navbar = () => {
                   Clean Youtube
                 </Typography>
               </Link>
-              {!isMobile && (
-                <Link
-                  href="https://www.youtube.com/@mkasiam"
-                  target="_blank"
-                  underline="hover"
-                >
-                  <Typography variant="body1">By MKA</Typography>
-                </Link>
-              )}
             </Stack>
 
             <Button

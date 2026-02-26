@@ -18,7 +18,7 @@ const VideoItem = () => {
       <Box
         sx={{
           position: "relative",
-          paddingBottom: "56.25%",
+          paddingBottom: "53.25%",
           height: 0,
           overflow: "hidden",
           maxWidth: "100%",
@@ -41,7 +41,7 @@ const VideoItem = () => {
             height: "100%",
             width: "100%",
             playerVars: {
-              autoplay: 1,
+              autoplay: 0,
               rel: 0,
               controls: 1,
               modestbranding: 1,

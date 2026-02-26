@@ -14,6 +14,7 @@ const PlaylistItems = ({
   item,
   index,
   currentPlaylistId,
+  getVideoIndex,
   channelTitle,
   compact = false,
   active = false,
@@ -21,6 +22,9 @@ const PlaylistItems = ({
   return (
     <Grid item xs={12}>
       <Link
+        onClick={() => {
+          getVideoIndex(index);
+        }}
         to={`/player/${currentPlaylistId}/${item.videoId}`}
         component={RouterLink}
         sx={{ textDecoration: "none" }}
