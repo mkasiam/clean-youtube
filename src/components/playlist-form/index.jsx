@@ -5,10 +5,10 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useStoreActions, useStoreState } from "easy-peasy";
 import { extractYoutubePlaylistId } from "../utils/extract-youtube-playlistId";
-import { CircularProgress, Snackbar, Alert } from "@mui/material";
+import { CircularProgress, Snackbar, Alert, Typography } from "@mui/material";
 
 const PlaylistForm = ({ open, handleClose }) => {
   const [state, setState] = useState("");
@@ -18,7 +18,7 @@ const PlaylistForm = ({ open, handleClose }) => {
   const { getPlaylistData, setError } = useStoreActions(
     (actions) => actions.playlists,
   );
-  const { error, isLoading, data } = useStoreState((state) => state.playlists);
+  const { error, isLoading } = useStoreState((state) => state.playlists);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,19 +34,21 @@ const PlaylistForm = ({ open, handleClose }) => {
       return;
     }
 
-    await getPlaylistData(playlistId);
-    setState("");
-    if (data[playlistId]) {
-      setSuccessMessage("Playlist added successfully!");
+    try {
+      await getPlaylistData(playlistId);
+      setState("");
+      setOpenSnackbar(true);
+      setSuccessMessage("Data Fetched Successfully.");
+      handleClose();
+    } catch {
+      setOpenSnackbar(true);
     }
-    setOpenSnackbar(true);
   };
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
-    if (!successMessage) {
-      setError("");
-    }
+    setSuccessMessage("");
+    setError("");
   };
 
   return (
@@ -70,6 +72,11 @@ const PlaylistForm = ({ open, handleClose }) => {
             />
           </form>
           {isLoading && <CircularProgress />}
+          {error && (
+            <Typography variant="body1" color="error">
+              {error}
+            </Typography>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} disabled={isLoading}>
@@ -82,7 +89,7 @@ const PlaylistForm = ({ open, handleClose }) => {
       </Dialog>
 
       <Snackbar
-        open={openSnackbar || !!error || !!successMessage}
+        open={openSnackbar}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
       >

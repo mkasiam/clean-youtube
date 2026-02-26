@@ -24,7 +24,7 @@ const playlistModel = persist(
     getPlaylistData: thunk(async (actions, payload, helpers) => {
       if (helpers.getState().data[payload]) {
         actions.setError("Playlist Already Exists");
-        return;
+        throw Error;
       }
 
       actions.setLoading(true);
@@ -36,6 +36,7 @@ const playlistModel = persist(
         actions.setError(
           e?.response?.data?.error?.message || "Something Went Wrong!",
         );
+        throw e;
       } finally {
         actions.setLoading(false);
       }
