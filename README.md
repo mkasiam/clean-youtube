@@ -1,11 +1,11 @@
-Problem
+## Problem
 Learning from YouTube playlists is often distracting and poorly organized.
 
-Solution
+## Solution
 Clean YouTube provides a minimal interface to manage playlists,
 watch videos sequentially, and track favorite and recent playlists.
 
-# Clean YouTube
+## Clean YouTube
 
 Clean YouTube is a React-based playlist learning app that lets users save YouTube playlists, organize them, and watch videos in a cleaner, distraction-free interface.
 
