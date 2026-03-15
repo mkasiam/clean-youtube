@@ -1,16 +1,110 @@
-# React + Vite
+# Clean YouTube
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Clean YouTube is a React-based playlist learning app that lets users save YouTube playlists, organize them, and watch videos in a cleaner, distraction-free interface.
 
-Currently, two official plugins are available:
+## Live Demo
+Live Site: https://clean-youtube-xi.vercel.app/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Project Overview
+This project was built to make playlist-based learning from YouTube more focused and organized. Instead of jumping through YouTube’s default interface, users can add a playlist by URL or playlist ID, browse videos, mark playlists as favorites, revisit recently opened playlists, and continue learning in a simplified UI.
 
-## React Compiler
+## Key Features
+- Add playlists using either a YouTube playlist URL or playlist ID
+- Validate playlist input before fetching data
+- Fetch playlist details and all videos from the YouTube Data API
+- Watch individual playlist videos inside the app
+- Save playlists locally for persistence
+- Mark playlists as favorites
+- Track recently opened playlists
+- Delete playlists from local storage
+- Responsive interface built with Material UI
+- Clean error and success feedback using Snackbar alerts
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
+- React
+- Vite
+- Easy Peasy
+- React Router
+- Material UI
+- Axios
+- React YouTube
+- LocalStorage
+- YouTube Data API v3
 
-## Expanding the ESLint configuration
+## State Management
+This project uses Easy Peasy for state management with persisted store models.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Store Modules
+- `playlists`: stores fetched playlist data, loading state, and errors
+- `favorites`: stores favorite playlist IDs
+- `recents`: stores recently opened playlist IDs
+
+## How It Works
+1. User pastes a playlist URL or playlist ID
+2. The app validates the input
+3. Playlist data is fetched from the YouTube Data API
+4. All playlist items are collected, including paginated results
+5. The playlist is saved into persisted app state
+6. User can open the playlist, watch videos, and manage favorites/recents
+
+## Project Structure
+```bash
+src/
+├── api/
+├── components/
+├── hooks/
+├── store/
+├── App.jsx
+├── main.jsx
+└── index.css
+````
+
+## Environment Variables
+
+Create a `.env` file in the root directory and add:
+
+```env
+VITE_YOUTUBE_API_KEY=your_youtube_api_key_here
+```
+
+## Installation
+
+```bash
+git clone https://github.com/mkasiam/clean-youtube.git
+cd clean-youtube
+npm install
+npm run dev
+```
+
+## Build for Production
+
+```bash
+npm run build
+npm run preview
+```
+
+## What I Practiced in This Project
+
+* Building a real-world React application with Vite
+* Managing app-wide state using Easy Peasy
+* Persisting user data in LocalStorage
+* Working with external APIs using Axios
+* Handling playlist pagination from the YouTube API
+* Creating reusable UI flows with Material UI
+* Building a clean content-consumption interface around a real user problem
+
+## Future Improvements
+
+* Add search inside a playlist
+* Add user authentication
+* Sync playlists across devices
+* Add note-taking per video
+* Add progress tracking for completed videos
+
+## Author
+
+M K A Siam
+
+GitHub: [https://github.com/mkasiam](https://github.com/mkasiam)
+
+```
