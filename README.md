@@ -106,5 +106,3 @@ npm run preview
 M K A Siam
 
 GitHub: [https://github.com/mkasiam](https://github.com/mkasiam)
-
-```
