@@ -208,6 +208,28 @@ const VideoItem = ({ customContext }) => {
             <Button variant="contained" sx={{ borderRadius: 50, px: 3, bgcolor: 'text.primary', color: 'background.paper', '&:hover': { bgcolor: 'text.secondary' }, display: { xs: 'none', sm: 'flex' } }}>
               Subscribe
             </Button>
+
+            <Button
+              variant="outlined"
+              startIcon={<AspectRatioIcon />}
+              onClick={toggleSidebar}
+              sx={{
+                borderRadius: 50,
+                px: 2,
+                textTransform: 'none',
+                fontWeight: 700,
+                borderColor: 'divider',
+                bgcolor: !togglePlaylistItems ? 'primary.main' : 'transparent',
+                color: !togglePlaylistItems ? '#fff' : 'text.primary',
+                '&:hover': {
+                  bgcolor: !togglePlaylistItems ? 'primary.dark' : 'action.hover',
+                  borderColor: 'primary.main'
+                },
+                display: { xs: 'none', md: 'flex' }
+              }}
+            >
+              {!togglePlaylistItems ? "Exit Theater" : "Theater Mode"}
+            </Button>
           </Stack>
 
           <Stack direction="row" spacing={1} sx={{ width: { xs: '100%', md: 'auto' }, justifyContent: 'flex-end' }}>
@@ -217,8 +239,15 @@ const VideoItem = ({ customContext }) => {
               <Button sx={{ px: 2, color: 'text.primary' }}><ThumbDownOutlinedIcon /></Button>
             </Box>
 
-            <IconButton onClick={toggleSidebar} sx={{ bgcolor: togglePlaylistItems ? 'primary.main' : 'action.hover', color: togglePlaylistItems ? '#fff' : 'inherit' }}>
-              <ViewSidebarOutlinedIcon />
+            <IconButton 
+              onClick={toggleSidebar} 
+              sx={{ 
+                display: { xs: 'flex', md: 'none' },
+                bgcolor: !togglePlaylistItems ? 'primary.main' : 'action.hover',
+                color: !togglePlaylistItems ? '#fff' : 'inherit'
+              }}
+            >
+              <AspectRatioIcon />
             </IconButton>
           </Stack>
         </Stack>

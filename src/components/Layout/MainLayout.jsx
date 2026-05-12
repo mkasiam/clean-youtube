@@ -13,8 +13,15 @@ const MainLayout = () => {
   
   const [sidebarOpen, setSidebarOpen] = useState(() => {
     const saved = localStorage.getItem('sidebar-open');
+    if (location.pathname.includes("/player")) return false;
     return saved !== null ? JSON.parse(saved) : isDesktop;
   });
+
+  useEffect(() => {
+    if (location.pathname.includes("/player")) {
+      setSidebarOpen(false);
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     localStorage.setItem('sidebar-open', JSON.stringify(sidebarOpen));
