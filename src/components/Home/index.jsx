@@ -7,12 +7,7 @@ const HomeLayout = () => {
   const playlistArray = Object.values(playlists);
 
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" fontWeight={700} gutterBottom>
-          Recommended Playlists
-        </Typography>
-      </Box>
+    <Container maxWidth="xl" sx={{ mt: 2 }}>
       <Playlists playlistArrays={playlistArray}></Playlists>
     </Container>
   );

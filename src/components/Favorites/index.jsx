@@ -11,12 +11,7 @@ const FavoritesPage = () => {
   );
 
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" fontWeight={700} gutterBottom>
-          Favorite Playlists
-        </Typography>
-      </Box>
+    <Container maxWidth="xl" sx={{ mt: 2 }}>
       {favoritePlaylistsArray.length > 0 ? (
         <Playlists
           playlistArrays={favoritePlaylistsArray}

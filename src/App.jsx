@@ -9,14 +9,51 @@ import PlaylistDescription from "./components/player-page/playlist-description";
 import MainLayout from "./components/Layout/MainLayout";
 import HistoryPage from "./components/History";
 import FavoritesPage from "./components/Favorites";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#ff0000', // YouTube Red
+    },
+    background: {
+      default: '#0f0f0f', // YouTube Dark Background
+      paper: '#0f0f0f',
+    },
+    text: {
+      primary: '#ffffff',
+      secondary: '#aaaaaa',
+    },
+  },
+  typography: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    h4: {
+      fontWeight: 700,
+    },
+    h5: {
+      fontWeight: 700,
+    },
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+          borderRadius: 50,
+        },
+      },
+    },
+  },
+});
 
 function App() {
   const { data: playlists } = useStoreState((state) => state.playlists);
 
   return (
-    <>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
       <BrowserRouter>
-        <CssBaseline />
         <Routes>
           <Route element={<MainLayout />}>
             <Route path="/" element={<HomeLayout />} />
@@ -33,7 +70,7 @@ function App() {
           </Route>
         </Routes>
       </BrowserRouter>
-    </>
+    </ThemeProvider>
   );
 }
 

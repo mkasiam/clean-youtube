@@ -11,12 +11,14 @@ const MainLayout = () => {
   const location = useLocation();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   
-  // Sidebar state: open by default on desktop, closed on mobile
-  const [sidebarOpen, setSidebarOpen] = useState(isDesktop);
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    const saved = localStorage.getItem('sidebar-open');
+    return saved !== null ? JSON.parse(saved) : isDesktop;
+  });
 
   useEffect(() => {
-    setSidebarOpen(isDesktop);
-  }, [isDesktop]);
+    localStorage.setItem('sidebar-open', JSON.stringify(sidebarOpen));
+  }, [sidebarOpen]);
 
   const handleDrawerToggle = () => {
     setSidebarOpen(!sidebarOpen);
@@ -37,19 +39,18 @@ const MainLayout = () => {
         sx={{
           flexGrow: 1,
           width: '100%',
-          minWidth: 0, // Critical for flex children to not overflow
+          minWidth: 0,
           mt: { xs: 7, sm: 8, md: 9 },
           transition: theme.transitions.create(["margin", "width"], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
           }),
-          ...(isDesktop && sidebarOpen && {
-            ml: 0, // Since variant is persistent, we don't need margin shift if width is calculated
-            width: `calc(100% - ${drawerWidth}px)`,
+          ...(isDesktop && {
+            marginLeft: sidebarOpen ? 0 : `-${drawerWidth}px`,
           }),
         }}
       >
-        <Box sx={{ p: { xs: 1, sm: 2, md: 3 } }}>
+        <Box sx={{ width: '100%' }}>
           <Outlet />
         </Box>
       </Box>

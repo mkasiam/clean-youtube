@@ -11,12 +11,7 @@ const HistoryPage = () => {
   );
 
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" fontWeight={700} gutterBottom>
-          Watch History
-        </Typography>
-      </Box>
+    <Container maxWidth="xl" sx={{ mt: 2 }}>
       {recentPlaylistsArray.length > 0 ? (
         <Playlists
           playlistArrays={recentPlaylistsArray}
