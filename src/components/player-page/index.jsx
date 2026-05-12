@@ -1,13 +1,17 @@
-import { Container, Typography, Grid, Box, Icon, Button } from "@mui/material";
-import { Outlet, useParams } from "react-router";
+import { useState, useContext, useEffect } from "react";
+import { Box, Grid, Typography, useTheme } from "@mui/material";
+import { useParams, Outlet } from "react-router";
 import PlaylistItems from "./playlist-items";
-import { useEffect, useState } from "react";
-import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import PlaylistDescription from "./playlist-description";
+import { ThemeContext } from "../../App";
 
 const PlayerPage = ({ playlists }) => {
   const { playlistId, videoId } = useParams();
+  const { mode } = useContext(ThemeContext);
+  const theme = useTheme();
   const currentPlaylist = playlists[playlistId];
+
+  if (!currentPlaylist) return <Typography sx={{ p: 4 }}>Playlist not found</Typography>;
 
   const {
     playlistId: currentPlaylistId,
@@ -23,143 +27,177 @@ const PlayerPage = ({ playlists }) => {
   );
 
   const [videoIndex, setVideoIndex] = useState(currentVideoIndex || 0);
-  const [togglePlaylistItems, setTogglePlaylistItems] = useState(false);
-
-  const isVideoRoute = Boolean(videoId);
+  const [togglePlaylistItems, setTogglePlaylistItems] = useState(true);
 
   useEffect(() => {
-    if (!isVideoRoute) {
-      setTogglePlaylistItems(true);
+    if (currentVideoIndex !== -1) {
+      setVideoIndex(currentVideoIndex);
     }
-  }, [isVideoRoute]);
-
-  if (!currentPlaylist) return <Typography>Playlist not found</Typography>;
+  }, [currentVideoIndex]);
 
   const getVideoIndex = (index) => {
     setVideoIndex(index);
   };
 
   const toggleSidebar = () => {
-    if (togglePlaylistItems) {
-      window.scrollBy({
-        top: 150,
-        left: 0,
-        behavior: "smooth",
-      });
-    }
     setTogglePlaylistItems(!togglePlaylistItems);
   };
 
+  const isZenMode = !togglePlaylistItems;
+  const isVideoView = Boolean(videoId);
+
   return (
-    <Container maxWidth="lg">
-      {isVideoRoute && (
-        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-          <Button
-            onClick={toggleSidebar}
-            startIcon={!togglePlaylistItems && <ArrowBackIosNewIcon />}
-            endIcon={togglePlaylistItems && <ArrowForwardIosIcon />}
-            title="Show | Hide Element"
-            variant="outlined"
-          >
-            {togglePlaylistItems ? "Hide Sidebar" : "Show Sidebar"}
-          </Button>
-        </Box>
-      )}
-      <Container
-        sx={{
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          justifyContent: "space-between",
-          gap: 2,
-        }}
-      >
-        {/* VideoPlayer Outlet  */}
-        <Box
-          sx={{
-            flex: {
-              xs: "1 1 100%",
-              md: isVideoRoute ? "2 1 0%" : "1 1 0%",
-            },
-            minWidth: 0,
-          }}
-          id="#video"
-        >
-          <Outlet
-            context={{
-              channelTitle,
-              playlistTitle,
-              playlistDescription,
-              playlistThumbnail,
-              playlistItems,
-            }}
-          />
-        </Box>
+    <Box sx={{ 
+      width: '100%', 
+      height: 'auto', 
+      overflowX: 'hidden',
+      position: 'relative',
+      bgcolor: 'background.default'
+    }}>
+      {/* 1. PLAYLIST OVERVIEW VIEW (33/67 Split) */}
+      {!isVideoView && (
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', lg: 'row' }, height: '100%' }}>
+          {/* Left: Description (33%) */}
+          <Box sx={{ 
+            flex: { lg: '33 1 0%' }, 
+            maxWidth: { lg: '33.33%' },
+            p: 4, 
+            borderRight: { lg: '1px solid' },
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            height: { lg: 'calc(100vh - 64px)' },
+            overflowY: 'auto'
+          }}>
+            <PlaylistDescription 
+              customContext={{
+                playlistId: currentPlaylistId,
+                channelTitle,
+                playlistTitle,
+                playlistDescription,
+                playlistThumbnail,
+                playlistItems,
+                toggleSidebar,
+                togglePlaylistItems
+              }} 
+            />
+          </Box>
 
-        {/* Playlist Items */}
-        {togglePlaylistItems && (
-          <Box
-            sx={{
-              flex: {
-                xs: "1 1 100%",
-                md: isVideoRoute ? "1 1 0%" : "2 1 0%",
-              },
-              alignSelf: { xs: "stretch", md: "flex-start" },
-              height: { xs: "auto", md: "calc(100vh - 88px)" },
-              overflowY: { xs: "visible", md: "auto" },
-              paddingRight: { xs: 0, md: 1 },
-              minWidth: 0,
-              position: "relative",
-            }}
-          >
-            {/* Video Completion Indicator  */}
-            {isVideoRoute && (
-              <Box
-                sx={{
-                  p: 2,
-                  borderRadius: 3,
-                  bgcolor: "background.paper",
-                  boxShadow: 3,
-                  mb: 1,
-                  position: "sticky",
-                  top: 0,
-                  zIndex: 10,
-                }}
-              >
-                <Typography variant="h6" fontWeight={600}>
-                  {playlistTitle}
-                </Typography>
-
-                <Typography variant="body2" color="text.secondary">
-                  {channelTitle} • {videoIndex + 1}/{playlistItems.length}
-                </Typography>
-              </Box>
-            )}
-
-            <Grid
-              container
-              spacing={2}
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
+          {/* Right: Videos Grid (67%) */}
+          <Box sx={{ 
+            flex: { lg: '67 1 0%' }, 
+            p: 4, 
+            height: { lg: 'calc(100vh - 64px)' },
+            overflowY: 'auto'
+          }}>
+            <Typography variant="h5" fontWeight={800} sx={{ mb: 4 }}>Playlist Videos</Typography>
+            <Grid container spacing={3}>
               {playlistItems.map((item, index) => (
-                <PlaylistItems
-                  key={item.videoId}
-                  item={item}
-                  index={index}
-                  currentPlaylistId={currentPlaylistId}
-                  getVideoIndex={getVideoIndex}
-                  channelTitle={channelTitle}
-                  compact={isVideoRoute}
-                  active={item.videoId === videoId}
-                />
+                <Grid item xs={12} sm={6} md={6} xl={4} key={item.videoId}>
+                  <PlaylistItems
+                    item={item}
+                    index={index}
+                    currentPlaylistId={currentPlaylistId}
+                    getVideoIndex={getVideoIndex}
+                    channelTitle={channelTitle}
+                    compact={false}
+                    active={false}
+                  />
+                </Grid>
               ))}
             </Grid>
           </Box>
-        )}
-      </Container>
-    </Container>
+        </Box>
+      )}
+
+      {/* 2. VIDEO PLAYER VIEW (Theater Mode Compatible) */}
+      {isVideoView && (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", lg: "row" },
+            width: '100%',
+            minHeight: 'calc(100vh - 64px)'
+          }}
+        >
+          {/* Main Content Area (Video + Details Below) */}
+          <Box
+            sx={{
+              flex: togglePlaylistItems ? { lg: "3 1 0%" } : "1 1 100%",
+              minWidth: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              bgcolor: 'background.default'
+            }}
+          >
+            {/* Video Section */}
+            <Box sx={{ 
+              width: '100%', 
+              bgcolor: '#000', 
+              aspectRatio: '16/9'
+            }}>
+              <Outlet
+                context={{
+                  playlistId: currentPlaylistId,
+                  channelTitle,
+                  playlistTitle,
+                  playlistDescription,
+                  playlistThumbnail,
+                  playlistItems,
+                  toggleSidebar,
+                  togglePlaylistItems,
+                  videoIndex,
+                  getVideoIndex
+                }}
+              />
+            </Box>
+
+            {/* Details Section (Always visible below) */}
+            {/* Handled by VideoItem internal rendering */}
+          </Box>
+
+          {/* Playlist Sidebar (Right) - Toggleable */}
+          {togglePlaylistItems && (
+            <Box
+              sx={{
+                flex: { lg: "1 1 0%" },
+                maxWidth: { lg: '420px' },
+                height: { xs: 'auto', lg: "calc(100vh - 64px)" },
+                overflowY: "auto",
+                bgcolor: 'background.paper',
+                borderLeft: '1px solid',
+                borderColor: 'divider',
+                position: 'sticky',
+                top: 64
+              }}
+            >
+              <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
+                <Typography variant="subtitle1" fontWeight={700} noWrap>{playlistTitle}</Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {channelTitle} • {videoIndex + 1} / {playlistItems.length}
+                </Typography>
+              </Box>
+
+              <Box sx={{ flexGrow: 1 }}>
+                <Grid container spacing={0}>
+                  {playlistItems.map((item, index) => (
+                    <PlaylistItems
+                      key={item.videoId}
+                      item={item}
+                      index={index}
+                      currentPlaylistId={currentPlaylistId}
+                      getVideoIndex={getVideoIndex}
+                      channelTitle={channelTitle}
+                      compact={true}
+                      active={item.videoId === videoId}
+                    />
+                  ))}
+                </Grid>
+              </Box>
+            </Box>
+          )}
+        </Box>
+      )}
+    </Box>
   );
 };
 

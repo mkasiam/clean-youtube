@@ -7,24 +7,11 @@ const Playlists = ({
   favorite = false,
 }) => {
   return (
-    <Container sx={{ mb: 4 }}>
-      <Typography
-        variant="h5"
-        component="h2"
-        sx={{ fontWeight: 600, mb: 1, ml: 1 }}
-      >
-        {recent
-          ? `Recent Playlists `
-          : favorite
-            ? `Favorite Playlists `
-            : `Playlists `}
-        ({playlistArrays.length})
-      </Typography>
-
+    <Container sx={{ mb: 4, px: { xs: 1, sm: 2 } }}>
       {playlistArrays.length > 0 && (
         <Grid
           container
-          spacing={1}
+          spacing={2}
           sx={{
             display: "flex",
             alignItems: "stretch",

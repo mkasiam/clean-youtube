@@ -9,6 +9,9 @@ const playlistModel = persist(
     addPlaylist: action((state, payload) => {
       state.data[payload.playlistId] = payload;
     }),
+    updatePlaylist: action((state, payload) => {
+      state.data[payload.playlistId] = payload;
+    }),
     removePlaylist: action((state, payload) => {
       if (!state.data[payload]) {
         return;
@@ -37,6 +40,20 @@ const playlistModel = persist(
           e?.response?.data?.error?.message || "Something Went Wrong!",
         );
         throw e;
+      } finally {
+        actions.setLoading(false);
+      }
+    }),
+    refreshPlaylistData: thunk(async (actions, payload, helpers) => {
+      actions.setLoading(true);
+      try {
+        const playlist = await getPlaylist(payload);
+        actions.updatePlaylist(playlist);
+        actions.setError("");
+      } catch (e) {
+        actions.setError(
+          e?.response?.data?.error?.message || "Something Went Wrong!",
+        );
       } finally {
         actions.setLoading(false);
       }
