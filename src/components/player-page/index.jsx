@@ -49,8 +49,8 @@ const PlayerPage = ({ playlists }) => {
   return (
     <Box sx={{ 
       width: '100%', 
-      height: isVideoView && isZenMode ? 'calc(100vh - 64px)' : 'auto', 
-      overflow: 'hidden',
+      height: 'auto', 
+      overflowX: 'hidden',
       position: 'relative',
       bgcolor: 'background.default'
     }}>
@@ -109,28 +109,33 @@ const PlayerPage = ({ playlists }) => {
         </Box>
       )}
 
-      {/* 2. VIDEO PLAYER VIEW (Standard YouTube) */}
+      {/* 2. VIDEO PLAYER VIEW (Theater Mode Compatible) */}
       {isVideoView && (
         <Box
           sx={{
             display: "flex",
             flexDirection: { xs: "column", lg: "row" },
-            height: '100%',
+            width: '100%',
+            minHeight: 'calc(100vh - 64px)'
           }}
         >
-          {/* Main Video Section (Left) */}
+          {/* Main Content Area (Video + Details Below) */}
           <Box
             sx={{
-              flex: isZenMode ? "1 1 100%" : { lg: "3 1 0%" },
+              flex: togglePlaylistItems ? { lg: "3 1 0%" } : "1 1 100%",
               minWidth: 0,
-              bgcolor: '#000',
-              height: isZenMode ? 'calc(100vh - 64px)' : 'auto',
-              overflowY: isZenMode ? 'hidden' : 'auto',
               display: 'flex',
-              flexDirection: 'column'
+              flexDirection: 'column',
+              bgcolor: 'background.default'
             }}
           >
-            <Box sx={{ flexGrow: 1, width: '100%' }}>
+            {/* Video Section */}
+            <Box sx={{ 
+              width: '100%', 
+              bgcolor: '#000', 
+              aspectRatio: '16/9',
+              maxHeight: 'calc(100vh - 200px)' 
+            }}>
               <Outlet
                 context={{
                   playlistId: currentPlaylistId,
@@ -146,21 +151,24 @@ const PlayerPage = ({ playlists }) => {
                 }}
               />
             </Box>
+
+            {/* Details Section (Always visible below) */}
+            {/* Handled by VideoItem internal rendering */}
           </Box>
 
-          {/* Playlist Sidebar (Right) */}
+          {/* Playlist Sidebar (Right) - Toggleable */}
           {togglePlaylistItems && (
             <Box
               sx={{
                 flex: { lg: "1 1 0%" },
-                maxWidth: { lg: '400px' },
+                maxWidth: { lg: '420px' },
                 height: { xs: 'auto', lg: "calc(100vh - 64px)" },
                 overflowY: "auto",
                 bgcolor: 'background.paper',
                 borderLeft: '1px solid',
                 borderColor: 'divider',
-                display: 'flex',
-                flexDirection: 'column'
+                position: 'sticky',
+                top: 64
               }}
             >
               <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
@@ -170,7 +178,7 @@ const PlayerPage = ({ playlists }) => {
                 </Typography>
               </Box>
 
-              <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
+              <Box sx={{ flexGrow: 1 }}>
                 <Grid container spacing={0}>
                   {playlistItems.map((item, index) => (
                     <PlaylistItems
