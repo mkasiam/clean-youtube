@@ -24,8 +24,10 @@ const MainLayout = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
+  const isPlayerPage = location.pathname.includes("/player");
+
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: 'background.default' }}>
+    <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "background.default" }}>
       <Navbar onMenuClick={handleDrawerToggle} />
       
       <Sidebar
@@ -41,6 +43,7 @@ const MainLayout = () => {
           width: '100%',
           minWidth: 0,
           mt: { xs: 7, sm: 8, md: 9 },
+          px: isPlayerPage ? 0 : { xs: 2, sm: 3 },
           transition: theme.transitions.create(["margin", "width"], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,

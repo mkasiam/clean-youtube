@@ -117,20 +117,17 @@ const VideoItem = ({ customContext }) => {
           alignItems: 'center',
           aspectRatio: '16/9',
           maxHeight: 'calc(100vh - 120px)',
+          overflow: 'hidden',
           "& .youtube-container": {
             width: "100%",
             height: "100%",
-          },
-          "& iframe": {
-            width: "100%",
-            height: "100%",
-            border: "none",
           },
         }}
       >
         <YouTube
           videoId={videoId}
           containerClassName="youtube-container"
+          style={{ width: '100%', height: '100%' }}
           opts={{
             height: "100%",
             width: "100%",
