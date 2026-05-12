@@ -2,24 +2,30 @@ import { useState } from "react";
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import Navbar from "../navbar";
 import Sidebar from "../Sidebar";
-import { Outlet } from "react-router";
+import { Outlet, useLocation } from "react-router";
 
 const MainLayout = () => {
   const theme = useTheme();
+  const location = useLocation();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
-  const [mobileOpen, setMobileOpen] = useState(false);
+  
+  // Sidebar state: open by default on desktop, closed on mobile
+  const [sidebarOpen, setSidebarOpen] = useState(isDesktop);
 
   const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
+    setSidebarOpen(!sidebarOpen);
   };
+
+  // Check if we are in the video section (player/:playlistId/:videoId)
+  const isVideoPage = location.pathname.includes("/player/") && location.pathname.split("/").length > 3;
 
   return (
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
-      <Navbar onMenuClick={handleDrawerToggle} />
+      {!isVideoPage && <Navbar onMenuClick={handleDrawerToggle} />}
       
       <Sidebar
-        variant={isDesktop ? "permanent" : "temporary"}
-        open={isDesktop ? true : mobileOpen}
+        variant={isDesktop ? "persistent" : "temporary"}
+        open={sidebarOpen}
         onClose={handleDrawerToggle}
       />
 
@@ -28,9 +34,14 @@ const MainLayout = () => {
         sx={{
           flexGrow: 1,
           p: { xs: 2, sm: 3 },
-          width: { md: `calc(100% - 240px)` },
-          mt: { xs: 7, sm: 8, md: 9 }, // Responsive margin top for fixed Navbar
-          transition: (theme) => theme.transitions.create(['margin', 'width'], {
+          width: { 
+            md: sidebarOpen ? `calc(100% - 240px)` : "100%" 
+          },
+          ml: { 
+            md: sidebarOpen ? 0 : 0 
+          },
+          mt: !isVideoPage ? { xs: 7, sm: 8, md: 9 } : 0,
+          transition: theme.transitions.create(["margin", "width"], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
           }),
