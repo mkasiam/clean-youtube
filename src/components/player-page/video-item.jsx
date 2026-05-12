@@ -59,28 +59,51 @@ const VideoItem = ({ customContext }) => {
   // Keyboard Shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
+      // Ignore if user is typing in an input or textarea
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      
       if (!playerRef.current) return;
-      const player = playerRef.current.internalPlayer;
+      const player = playerRef.current;
 
       switch (e.key.toLowerCase()) {
         case " ":
         case "k":
           e.preventDefault();
-          player.getPlayerState().then(state => {
-            state === 1 ? player.pauseVideo() : player.playVideo();
-          });
+          const state = player.getPlayerState();
+          state === 1 ? player.pauseVideo() : player.playVideo();
           break;
         case "j":
-          player.getCurrentTime().then(time => player.seekTo(time - 10));
+          player.seekTo(player.getCurrentTime() - 10);
           break;
         case "l":
-          player.getCurrentTime().then(time => player.seekTo(time + 10));
+          player.seekTo(player.getCurrentTime() + 10);
+          break;
+        case "arrowleft":
+          e.preventDefault();
+          player.seekTo(player.getCurrentTime() - 5);
+          break;
+        case "arrowright":
+          e.preventDefault();
+          player.seekTo(player.getCurrentTime() + 5);
+          break;
+        case "m":
+          player.isMuted() ? player.unMute() : player.mute();
           break;
         case "n":
           if (e.shiftKey) handleNext();
           break;
         case "p":
           if (e.shiftKey) handlePrevious();
+          break;
+        case "f":
+          const iframe = player.getIframe();
+          if (iframe) {
+            if (document.fullscreenElement) {
+              document.exitFullscreen();
+            } else {
+              iframe.requestFullscreen();
+            }
+          }
           break;
         default:
           break;
@@ -89,7 +112,7 @@ const VideoItem = ({ customContext }) => {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [videoIndex]);
+  }, [videoIndex, playlistItems]);
 
   const changeSpeed = (speed) => {
     if (playerRef.current) {
