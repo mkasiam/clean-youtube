@@ -41,12 +41,25 @@ const VideoItem = () => {
             height: "100%",
             width: "100%",
             playerVars: {
-              autoplay: 0,
+              autoplay: 1, // Changed to 1 to help with resume
               rel: 0,
               controls: 1,
               modestbranding: 1,
               fs: 1,
             },
+          }}
+          onReady={(event) => {
+            const savedTime = localStorage.getItem(`video-time-${videoId}`);
+            if (savedTime) {
+              event.target.seekTo(parseFloat(savedTime));
+            }
+          }}
+          onStateChange={(event) => {
+            // event.data: 1 (playing), 2 (paused), 0 (ended)
+            if (event.data === 1 || event.data === 2) {
+              const currentTime = event.target.getCurrentTime();
+              localStorage.setItem(`video-time-${videoId}`, currentTime);
+            }
           }}
         />
       </Box>
