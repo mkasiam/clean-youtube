@@ -104,7 +104,8 @@ const VideoItem = ({ customContext }) => {
       display: 'flex',
       flexDirection: 'column',
       bgcolor: 'background.default',
-      position: 'relative'
+      minHeight: '100%',
+      overflow: 'visible'
     }}>
       {/* Immersive Video Container */}
       <Box
@@ -174,77 +175,110 @@ const VideoItem = ({ customContext }) => {
           direction={{ xs: "column", md: "row" }}
           justifyContent="space-between"
           alignItems="center"
-          spacing={2}
-          sx={{ mb: 4 }}
+          spacing={3}
+          sx={{ mb: 4, width: '100%' }}
         >
-          <Stack direction="row" spacing={2} alignItems="center" sx={{ width: '100%' }}>
-            <Avatar sx={{ bgcolor: 'error.main', width: 40, height: 40 }}>{channelTitle?.charAt(0)}</Avatar>
-            <Box sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle1" fontWeight={800} noWrap>
+          <Stack direction="row" spacing={2} alignItems="center" sx={{ width: '100%', flexWrap: 'wrap', gap: 2 }}>
+            <Avatar sx={{ bgcolor: 'error.main', width: 44, height: 44, fontSize: '1.2rem', fontWeight: 700 }}>
+              {channelTitle?.charAt(0)}
+            </Avatar>
+            <Box sx={{ flexGrow: 1, minWidth: '150px' }}>
+              <Typography variant="subtitle1" fontWeight={900} noWrap sx={{ fontSize: '1.1rem' }}>
                 {channelTitle}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="text.secondary" fontWeight={600}>
                 1.2M subscribers
               </Typography>
             </Box>
             
-            <Stack direction="row" spacing={1}>
+            <Stack direction="row" spacing={1} alignItems="center">
               <IconButton 
                 onClick={handlePrevious} 
                 disabled={videoIndex === 0}
-                sx={{ bgcolor: 'action.hover' }}
+                sx={{ bgcolor: 'action.hover', border: '1px solid', borderColor: 'divider' }}
               >
                 <SkipPreviousIcon />
               </IconButton>
               <IconButton 
                 onClick={handleNext} 
                 disabled={videoIndex === playlistItems.length - 1}
-                sx={{ bgcolor: 'action.hover' }}
+                sx={{ bgcolor: 'action.hover', border: '1px solid', borderColor: 'divider' }}
               >
                 <SkipNextIcon />
               </IconButton>
+              
+              <Button 
+                variant="contained" 
+                sx={{ 
+                  borderRadius: 50, 
+                  px: 4, 
+                  py: 1,
+                  bgcolor: 'text.primary', 
+                  color: 'background.paper', 
+                  fontWeight: 800,
+                  textTransform: 'none',
+                  '&:hover': { bgcolor: 'text.secondary' } 
+                }}
+              >
+                Subscribe
+              </Button>
+
+              <Button
+                variant="outlined"
+                startIcon={<AspectRatioIcon />}
+                onClick={toggleSidebar}
+                sx={{
+                  borderRadius: 50,
+                  px: 2,
+                  py: 0.8,
+                  textTransform: 'none',
+                  fontWeight: 800,
+                  borderColor: 'divider',
+                  display: { xs: 'none', sm: 'flex' },
+                  bgcolor: !togglePlaylistItems ? 'primary.main' : 'transparent',
+                  color: !togglePlaylistItems ? '#fff' : 'text.primary',
+                  '&:hover': {
+                    bgcolor: !togglePlaylistItems ? 'primary.dark' : 'action.hover',
+                    borderColor: 'primary.main'
+                  }
+                }}
+              >
+                {!togglePlaylistItems ? "Exit Theater" : "Theater Mode"}
+              </Button>
             </Stack>
-
-            <Button variant="contained" sx={{ borderRadius: 50, px: 3, bgcolor: 'text.primary', color: 'background.paper', '&:hover': { bgcolor: 'text.secondary' }, display: { xs: 'none', sm: 'flex' } }}>
-              Subscribe
-            </Button>
-
-            <Button
-              variant="outlined"
-              startIcon={<AspectRatioIcon />}
-              onClick={toggleSidebar}
-              sx={{
-                borderRadius: 50,
-                px: 2,
-                textTransform: 'none',
-                fontWeight: 700,
-                borderColor: 'divider',
-                bgcolor: !togglePlaylistItems ? 'primary.main' : 'transparent',
-                color: !togglePlaylistItems ? '#fff' : 'text.primary',
-                '&:hover': {
-                  bgcolor: !togglePlaylistItems ? 'primary.dark' : 'action.hover',
-                  borderColor: 'primary.main'
-                },
-                display: { xs: 'none', md: 'flex' }
-              }}
-            >
-              {!togglePlaylistItems ? "Exit Theater" : "Theater Mode"}
-            </Button>
           </Stack>
 
-          <Stack direction="row" spacing={1} sx={{ width: { xs: '100%', md: 'auto' }, justifyContent: 'flex-end' }}>
-            <Box sx={{ display: 'flex', bgcolor: 'action.hover', borderRadius: 50 }}>
-              <Button startIcon={<ThumbUpOutlinedIcon />} sx={{ px: 2, color: 'text.primary', textTransform: 'none' }}>12K</Button>
-              <Divider orientation="vertical" flexItem />
+          <Stack direction="row" spacing={1.5} sx={{ width: { xs: '100%', md: 'auto' }, justifyContent: 'flex-end', flexShrink: 0 }}>
+            <Box sx={{ display: 'flex', bgcolor: 'action.hover', borderRadius: 50, border: '1px solid', borderColor: 'divider' }}>
+              <Button startIcon={<ThumbUpOutlinedIcon />} sx={{ px: 2, color: 'text.primary', textTransform: 'none', fontWeight: 700 }}>12K</Button>
+              <Divider orientation="vertical" flexItem sx={{ my: 1 }} />
               <Button sx={{ px: 2, color: 'text.primary' }}><ThumbDownOutlinedIcon /></Button>
             </Box>
+
+            <Button 
+              startIcon={<ShareOutlinedIcon />}
+              sx={{ 
+                bgcolor: 'action.hover', 
+                borderRadius: 50, 
+                px: 2, 
+                color: 'text.primary', 
+                textTransform: 'none', 
+                fontWeight: 700,
+                border: '1px solid',
+                borderColor: 'divider'
+              }}
+            >
+              Share
+            </Button>
 
             <IconButton 
               onClick={toggleSidebar} 
               sx={{ 
-                display: { xs: 'flex', md: 'none' },
+                display: { xs: 'flex', sm: 'none' },
                 bgcolor: !togglePlaylistItems ? 'primary.main' : 'action.hover',
-                color: !togglePlaylistItems ? '#fff' : 'inherit'
+                color: !togglePlaylistItems ? '#fff' : 'inherit',
+                border: '1px solid',
+                borderColor: 'divider'
               }}
             >
               <AspectRatioIcon />

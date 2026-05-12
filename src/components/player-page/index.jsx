@@ -133,9 +133,7 @@ const PlayerPage = ({ playlists }) => {
             <Box sx={{ 
               width: '100%', 
               bgcolor: '#000', 
-              aspectRatio: '16/9',
-              maxHeight: 'calc(100vh - 100px)',
-              overflow: 'hidden'
+              aspectRatio: '16/9'
             }}>
               <Outlet
                 context={{
