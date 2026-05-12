@@ -23,15 +23,9 @@ const PlayerPage = ({ playlists }) => {
   );
 
   const [videoIndex, setVideoIndex] = useState(currentVideoIndex || 0);
-  const [togglePlaylistItems, setTogglePlaylistItems] = useState(false);
+  const [togglePlaylistItems, setTogglePlaylistItems] = useState(true);
 
   const isVideoRoute = Boolean(videoId);
-
-  useEffect(() => {
-    if (!isVideoRoute) {
-      setTogglePlaylistItems(true);
-    }
-  }, [isVideoRoute]);
 
   if (!currentPlaylist) return <Typography>Playlist not found</Typography>;
 
@@ -40,49 +34,27 @@ const PlayerPage = ({ playlists }) => {
   };
 
   const toggleSidebar = () => {
-    if (togglePlaylistItems) {
-      window.scrollBy({
-        top: 150,
-        left: 0,
-        behavior: "smooth",
-      });
-    }
     setTogglePlaylistItems(!togglePlaylistItems);
   };
 
   return (
-    <Container maxWidth="lg">
-      {isVideoRoute && (
-        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-          <Button
-            onClick={toggleSidebar}
-            startIcon={!togglePlaylistItems && <ArrowBackIosNewIcon />}
-            endIcon={togglePlaylistItems && <ArrowForwardIosIcon />}
-            title="Show | Hide Element"
-            variant="outlined"
-          >
-            {togglePlaylistItems ? "Hide Sidebar" : "Show Sidebar"}
-          </Button>
-        </Box>
-      )}
-      <Container
+    <Container maxWidth="xl" sx={{ p: { xs: 0, sm: 2, md: 4 } }}>
+      <Box
         sx={{
           display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          justifyContent: "space-between",
-          gap: 2,
+          flexDirection: { xs: "column", lg: "row" },
+          gap: 3,
         }}
       >
-        {/* VideoPlayer Outlet  */}
+        {/* VideoPlayer Section */}
         <Box
           sx={{
             flex: {
               xs: "1 1 100%",
-              md: isVideoRoute ? "2 1 0%" : "1 1 0%",
+              lg: togglePlaylistItems && isVideoRoute ? "2.5 1 0%" : "1 1 0%",
             },
             minWidth: 0,
           }}
-          id="#video"
         >
           <Outlet
             context={{
@@ -91,74 +63,59 @@ const PlayerPage = ({ playlists }) => {
               playlistDescription,
               playlistThumbnail,
               playlistItems,
+              toggleSidebar, // Pass toggle down to VideoItem if needed
+              togglePlaylistItems
             }}
           />
         </Box>
 
-        {/* Playlist Items */}
+        {/* Playlist Sidebar Section */}
         {togglePlaylistItems && (
           <Box
             sx={{
               flex: {
                 xs: "1 1 100%",
-                md: isVideoRoute ? "1 1 0%" : "2 1 0%",
+                lg: "1 1 0%",
               },
-              alignSelf: { xs: "stretch", md: "flex-start" },
-              height: { xs: "auto", md: "calc(100vh - 88px)" },
-              overflowY: { xs: "visible", md: "auto" },
-              paddingRight: { xs: 0, md: 1 },
-              minWidth: 0,
-              position: "relative",
+              maxWidth: { lg: '400px' },
+              height: { lg: "calc(100vh - 40px)" },
+              overflowY: { lg: "auto" },
+              p: 1,
+              bgcolor: 'background.paper',
+              borderRadius: 3,
+              border: '1px solid rgba(0, 0, 0, 0.05)',
+              position: 'sticky',
+              top: 20,
             }}
           >
-            {/* Video Completion Indicator  */}
-            {isVideoRoute && (
-              <Box
-                sx={{
-                  p: 2,
-                  borderRadius: 3,
-                  bgcolor: "background.paper",
-                  boxShadow: 3,
-                  mb: 1,
-                  position: "sticky",
-                  top: 0,
-                  zIndex: 10,
-                }}
-              >
-                <Typography variant="h6" fontWeight={600}>
-                  {playlistTitle}
-                </Typography>
+            {/* Playlist Header */}
+            <Box sx={{ p: 2, mb: 1, borderBottom: '1px solid rgba(0, 0, 0, 0.08)' }}>
+              <Typography variant="h6" fontWeight={700}>
+                {playlistTitle}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                {channelTitle} • {videoIndex + 1} / {playlistItems.length}
+              </Typography>
+            </Box>
 
-                <Typography variant="body2" color="text.secondary">
-                  {channelTitle} • {videoIndex + 1}/{playlistItems.length}
-                </Typography>
-              </Box>
-            )}
-
-            <Grid
-              container
-              spacing={2}
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
+            <Grid container spacing={1} sx={{ mt: 1 }}>
               {playlistItems.map((item, index) => (
-                <PlaylistItems
-                  key={item.videoId}
-                  item={item}
-                  index={index}
-                  currentPlaylistId={currentPlaylistId}
-                  getVideoIndex={getVideoIndex}
-                  channelTitle={channelTitle}
-                  compact={isVideoRoute}
-                  active={item.videoId === videoId}
-                />
+                <Grid item xs={12} key={item.videoId}>
+                  <PlaylistItems
+                    item={item}
+                    index={index}
+                    currentPlaylistId={currentPlaylistId}
+                    getVideoIndex={getVideoIndex}
+                    channelTitle={channelTitle}
+                    compact={true}
+                    active={item.videoId === videoId}
+                  />
+                </Grid>
               ))}
             </Grid>
           </Box>
         )}
-      </Container>
+      </Box>
     </Container>
   );
 };
