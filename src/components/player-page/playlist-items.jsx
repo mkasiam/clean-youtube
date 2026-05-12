@@ -10,6 +10,8 @@ import {
 } from "@mui/material";
 import { Link as RouterLink } from "react-router";
 
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+
 const PlaylistItems = ({
   item,
   index,
@@ -29,59 +31,82 @@ const PlaylistItems = ({
         component={RouterLink}
         sx={{ textDecoration: "none" }}
       >
-        <Card
+        <Box
           sx={{
             display: "flex",
-            alignItems: "flex-start",
+            alignItems: "center",
             p: 1,
-            gap: 1,
-            border: "1px solid",
-            borderColor: active ? "primary.main" : "divider",
-            bgcolor: active ? "action.selected" : "background.paper",
+            gap: 1.5,
+            borderRadius: 2,
+            bgcolor: active ? "action.selected" : "transparent",
             "&:hover": { bgcolor: "action.hover" },
+            cursor: "pointer",
+            transition: 'all 0.2s',
+            borderLeft: active ? '4px solid' : '4px solid transparent',
+            borderColor: active ? 'info.main' : 'transparent'
           }}
         >
-          <Chip label={index + 1} size="small" sx={{ mt: compact ? 0.5 : 4 }} />
-          <CardMedia
-            component="img"
-            image={item.thumbnail.url}
-            alt={item.title}
-            sx={{
-              width: compact ? { xs: 140, lg: 160 } : 200,
-              height: compact ? { xs: 78, lg: 90 } : 112,
-              objectFit: "cover",
-              flexShrink: 0,
-              borderRadius: 1,
-            }}
-          />
-          <CardContent
-            sx={{
-              flex: 1,
-              display: "flex",
-              justifyContent: "space-between",
-              minWidth: 0,
-              p: "0 !important",
-            }}
-          >
-            <Box>
-              <Typography
-                variant={compact ? "subtitle2" : "subtitle1"}
-                sx={{
-                  fontWeight: active ? 600 : 500,
-                  display: "-webkit-box",
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: "vertical",
-                  overflow: "hidden",
+          {/* Index or Play Icon */}
+          <Box sx={{ minWidth: 24, display: 'flex', justifyContent: 'center' }}>
+            {active ? (
+              <PlayArrowIcon sx={{ fontSize: 18, color: 'info.main' }} />
+            ) : (
+              <Typography 
+                variant="caption" 
+                sx={{ 
+                  color: 'text.secondary',
+                  fontWeight: 700
                 }}
               >
-                {item.title}
+                {index + 1}
               </Typography>
-              <Typography variant="caption" sx={{ color: "text.secondary" }}>
-                {channelTitle}
-              </Typography>
-            </Box>
-          </CardContent>
-        </Card>
+            )}
+          </Box>
+
+          {/* Thumbnail */}
+          <Box sx={{ position: 'relative', flexShrink: 0 }}>
+            <CardMedia
+              component="img"
+              image={item.thumbnail.url}
+              alt={item.title}
+              sx={{
+                width: 120,
+                height: 68,
+                objectFit: "cover",
+                borderRadius: 2,
+              }}
+            />
+          </Box>
+
+          {/* Details */}
+          <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+            <Typography
+              variant="body2"
+              sx={{
+                fontWeight: active ? 700 : 500,
+                color: active ? 'info.main' : 'text.primary',
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+                fontSize: '0.875rem',
+                lineHeight: 1.2
+              }}
+            >
+              {item.title}
+            </Typography>
+            <Typography 
+              variant="caption" 
+              sx={{ 
+                color: "text.secondary",
+                display: 'block',
+                mt: 0.5
+              }}
+            >
+              {channelTitle}
+            </Typography>
+          </Box>
+        </Box>
       </Link>
     </Grid>
   );

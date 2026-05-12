@@ -2,14 +2,17 @@ import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { Button, Container, Stack, IconButton } from "@mui/material";
-import { useState } from "react";
+import { Button, Container, Stack, IconButton, Tooltip } from "@mui/material";
+import { useState, useContext } from "react";
 import PlaylistForm from "../playlist-form";
 import { Link as RouterLink } from "react-router";
 import { Link } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import MenuIcon from "@mui/icons-material/Menu";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import LightModeIcon from "@mui/icons-material/LightMode";
 import { useMediaQuery } from "@mui/material";
+import { ThemeContext } from "../../App";
 
 const YouTubeLogo = () => (
   <svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false" style={{ width: 40, height: 40, fill: '#FF0000' }}>
@@ -22,6 +25,7 @@ const YouTubeLogo = () => (
 const Navbar = ({ onMenuClick }) => {
   const [open, setOpen] = useState(false);
   const isMobile = useMediaQuery("(max-width:600px)");
+  const { mode, toggleTheme } = useContext(ThemeContext);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -40,8 +44,9 @@ const Navbar = ({ onMenuClick }) => {
           py: 1, 
           zIndex: (theme) => theme.zIndex.drawer + 1,
           boxShadow: 'none',
-          borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
-          bgcolor: 'background.default'
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
         }}
       >
         <Container maxWidth="xl">
@@ -77,14 +82,28 @@ const Navbar = ({ onMenuClick }) => {
               </Link>
             </Stack>
 
-            <Button
-              onClick={handleClickOpen}
-              variant="contained"
-              startIcon={<AddIcon />}
-              sx={{ borderRadius: 50, px: 3, textTransform: 'none', fontWeight: 600 }}
-            >
-              Add Playlist
-            </Button>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Tooltip title={`Switch to ${mode === 'dark' ? 'light' : 'dark'} mode`}>
+                <IconButton onClick={toggleTheme} color="inherit">
+                  {mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
+                </IconButton>
+              </Tooltip>
+
+              <Button
+                onClick={handleClickOpen}
+                variant="contained"
+                startIcon={<AddIcon />}
+                sx={{ 
+                  borderRadius: 50, 
+                  px: isMobile ? 1 : 3, 
+                  textTransform: 'none', 
+                  fontWeight: 600,
+                  minWidth: isMobile ? '40px' : 'auto'
+                }}
+              >
+                {!isMobile && "Add Playlist"}
+              </Button>
+            </Stack>
 
             <PlaylistForm open={open} handleClose={handleClose} />
           </Toolbar>

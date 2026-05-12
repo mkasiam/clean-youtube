@@ -1,5 +1,5 @@
 import { Box, Typography, Container, Button, Stack, Avatar, IconButton, Divider } from "@mui/material";
-import { useParams, useOutletContext } from "react-router";
+import { useParams, useOutletContext, useNavigate } from "react-router";
 import { useState, useEffect, useRef } from "react";
 import YouTube from "react-youtube";
 import useValidPlaylist from "../../hooks/useValidPlaylist.jsx";
@@ -10,19 +10,51 @@ import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import ViewSidebarOutlinedIcon from '@mui/icons-material/ViewSidebarOutlined';
 import AspectRatioIcon from '@mui/icons-material/AspectRatio';
+import SkipNextIcon from "@mui/icons-material/SkipNext";
+import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 
-const VideoItem = () => {
+const VideoItem = ({ customContext }) => {
   const { playlistId, videoId } = useParams();
+  const navigate = useNavigate();
   const { getVideoDetails } = useValidPlaylist();
-  const { toggleSidebar, togglePlaylistItems, channelTitle } = useOutletContext();
+  const outletContext = useOutletContext();
+  
+  const context = customContext || outletContext || {};
+  const { 
+    toggleSidebar, 
+    togglePlaylistItems, 
+    channelTitle, 
+    videoIndex, 
+    getVideoIndex, 
+    playlistItems,
+    playlistId: currentPlaylistId
+  } = context;
+  
   const playerRef = useRef(null);
 
   const { title, videoDescription } =
     getVideoDetails(playlistId, videoId) || {};
 
   const [expanded, setExpanded] = useState(false);
-  const [cinemaMode, setCinemaMode] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
+
+  const isZenMode = !togglePlaylistItems;
+
+  const handleNext = () => {
+    if (videoIndex < playlistItems.length - 1) {
+      const nextVideo = playlistItems[videoIndex + 1];
+      getVideoIndex(videoIndex + 1);
+      navigate(`/player/${currentPlaylistId}/${nextVideo.videoId}`);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (videoIndex > 0) {
+      const prevVideo = playlistItems[videoIndex - 1];
+      getVideoIndex(videoIndex - 1);
+      navigate(`/player/${currentPlaylistId}/${prevVideo.videoId}`);
+    }
+  };
 
   // Keyboard Shortcuts
   useEffect(() => {
@@ -44,8 +76,11 @@ const VideoItem = () => {
         case "l":
           player.getCurrentTime().then(time => player.seekTo(time + 10));
           break;
-        case "t":
-          setCinemaMode(prev => !prev);
+        case "n":
+          if (e.shiftKey) handleNext();
+          break;
+        case "p":
+          if (e.shiftKey) handlePrevious();
           break;
         default:
           break;
@@ -54,7 +89,7 @@ const VideoItem = () => {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [videoIndex]);
 
   const changeSpeed = (speed) => {
     if (playerRef.current) {
@@ -66,41 +101,44 @@ const VideoItem = () => {
   return (
     <Box sx={{ 
       width: '100%', 
+      height: isZenMode ? 'calc(100vh - 64px)' : 'auto',
+      display: 'flex',
+      flexDirection: 'column',
+      bgcolor: '#000',
       transition: 'all 0.3s ease',
-      ...(cinemaMode && {
-        maxWidth: '100% !important',
-        mx: -3, // Offset the padding from MainLayout
-        width: 'calc(100% + 48px)',
-        bgcolor: '#0f0f0f',
-        color: '#fff',
-        pb: 4
-      })
+      overflow: isZenMode ? 'hidden' : 'auto',
+      position: 'relative'
     }}>
       {/* Immersive Video Container */}
       <Box
         sx={{
           position: "relative",
-          paddingBottom: cinemaMode ? "50%" : "56.25%",
-          height: 0,
+          width: '100%',
+          flexGrow: 1,
+          height: isZenMode ? 'calc(100vh - 64px)' : 'auto',
+          aspectRatio: isZenMode ? 'unset' : '16/9',
           overflow: "hidden",
-          maxWidth: cinemaMode ? "100%" : "1280px",
-          mx: "auto",
           backgroundColor: "#000",
-          borderRadius: cinemaMode ? 0 : { xs: 0, sm: 3 },
-          boxShadow: cinemaMode ? 0 : 6,
-          transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          "& .youtube-container": {
+            width: "100%",
+            height: "100%",
+            maxWidth: isZenMode ? '100%' : '100%',
+            maxHeight: isZenMode ? '100%' : '100%',
+          },
           "& iframe": {
-            position: "absolute",
-            top: 0,
-            left: 0,
             width: "100%",
             height: "100%",
             border: "none",
+            objectFit: 'contain'
           },
         }}
       >
         <YouTube
           videoId={videoId}
+          containerClassName="youtube-container"
           opts={{
             height: "100%",
             width: "100%",
@@ -126,105 +164,139 @@ const VideoItem = () => {
               const currentTime = event.target.getCurrentTime();
               localStorage.setItem(`video-time-${videoId}`, currentTime);
             }
+            if (event.data === 0) { // Video ended
+              handleNext();
+            }
           }}
         />
       </Box>
 
-      {/* Control & Info Area */}
-      <Container maxWidth={cinemaMode ? "xl" : "lg"} sx={{ mt: 3 }}>
-        <Typography
-          variant="h5"
-          fontWeight={700}
-          sx={{ mb: 2, color: cinemaMode ? '#fff' : 'inherit' }}
-        >
-          {title || "Video Title"}
-        </Typography>
-
-        <Stack
-          direction={{ xs: "column", sm: "row" }}
-          justifyContent="space-between"
-          alignItems="center"
-          spacing={2}
-          sx={{ mb: 4 }}
-        >
-          <Stack direction="row" spacing={2} alignItems="center" sx={{ width: '100%' }}>
-            <Avatar sx={{ bgcolor: 'error.main' }}>{channelTitle?.charAt(0)}</Avatar>
-            <Box sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle1" fontWeight={700} sx={{ color: cinemaMode ? '#fff' : 'inherit' }}>
-                {channelTitle}
-              </Typography>
-              <Typography variant="body2" color={cinemaMode ? 'grey.500' : 'text.secondary'}>
-                1.2M subscribers
-              </Typography>
-            </Box>
-            <Button variant="contained" sx={{ borderRadius: 50, px: 3, textTransform: 'none', bgcolor: cinemaMode ? '#fff' : '#0f0f0f', color: cinemaMode ? '#000' : '#fff' }}>
-              Subscribe
-            </Button>
-          </Stack>
-
-          <Stack direction="row" spacing={1} sx={{ width: { xs: '100%', sm: 'auto' }, justifyContent: 'flex-end' }}>
-            <Box sx={{ display: 'flex', bgcolor: cinemaMode ? 'rgba(255,255,255,0.1)' : 'action.hover', borderRadius: 50 }}>
-              <Button startIcon={<ThumbUpOutlinedIcon />} sx={{ px: 2, color: cinemaMode ? '#fff' : 'inherit' }}>12K</Button>
-              <Divider orientation="vertical" flexItem sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
-              <Button sx={{ px: 2, color: cinemaMode ? '#fff' : 'inherit' }}><ThumbDownOutlinedIcon /></Button>
-            </Box>
-
-            <Button 
-              onClick={() => setCinemaMode(!cinemaMode)}
-              startIcon={<AspectRatioIcon />}
-              sx={{ 
-                bgcolor: cinemaMode ? 'rgba(255,255,255,0.1)' : 'action.hover', 
-                borderRadius: 50, 
-                color: cinemaMode ? '#fff' : 'inherit',
-                textTransform: 'none',
-                px: 2
-              }}
-            >
-              {cinemaMode ? "Exit Cinema" : "Cinema Mode"}
-            </Button>
-
-            <IconButton onClick={toggleSidebar} sx={{ color: cinemaMode ? '#fff' : 'inherit', bgcolor: cinemaMode ? 'rgba(255,255,255,0.1)' : 'action.hover' }}>
-              <ViewSidebarOutlinedIcon />
-            </IconButton>
-          </Stack>
-        </Stack>
-
-        {/* Playback Speed Quick Actions */}
-        <Stack direction="row" spacing={1} sx={{ mb: 3, overflowX: 'auto' }}>
-          <Typography variant="caption" sx={{ alignSelf: 'center', mr: 1, color: cinemaMode ? 'grey.500' : 'text.secondary' }}>SPEED:</Typography>
-          {[0.5, 1, 1.25, 1.5, 2].map((speed) => (
-            <Button
-              key={speed}
-              size="small"
-              onClick={() => changeSpeed(speed)}
-              variant={playbackSpeed === speed ? "contained" : "outlined"}
-              sx={{ 
-                minWidth: 50, 
-                borderRadius: 2, 
-                textTransform: 'none',
-                borderColor: cinemaMode ? 'rgba(255,255,255,0.2)' : 'divider',
-                color: cinemaMode && playbackSpeed !== speed ? '#fff' : 'inherit'
-              }}
-            >
-              {speed}x
-            </Button>
-          ))}
-        </Stack>
-
-        <Box sx={{ 
-          bgcolor: cinemaMode ? 'rgba(255,255,255,0.05)' : 'action.hover', 
-          p: 2, 
-          borderRadius: 3,
-          color: cinemaMode ? '#eee' : 'inherit'
-        }}>
-          <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
-            {expanded ? videoDescription : videoDescription?.slice(0, 200) + "..."}
+      {/* Control & Info Area - Only show if NOT in Zen mode */}
+      {!isZenMode && (
+        <Container maxWidth="lg" sx={{ mt: 3, pb: 4, bgcolor: 'background.default', color: 'text.primary', borderRadius: 4 }}>
+          <Typography
+            variant="h5"
+            fontWeight={800}
+            sx={{ mb: 2, mt: 2 }}
+          >
+            {title || "Video Title"}
           </Typography>
-          <Button size="small" onClick={() => setExpanded(!expanded)} sx={{ mt: 1, color: cinemaMode ? 'primary.light' : 'primary.main' }}>
-            {expanded ? "Show less" : "Show more"}
-          </Button>
+
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            justifyContent="space-between"
+            alignItems="center"
+            spacing={2}
+            sx={{ mb: 4 }}
+          >
+            <Stack direction="row" spacing={2} alignItems="center" sx={{ width: '100%' }}>
+              <Avatar sx={{ bgcolor: 'error.main', width: 48, height: 48 }}>{channelTitle?.charAt(0)}</Avatar>
+              <Box sx={{ flexGrow: 1 }}>
+                <Typography variant="subtitle1" fontWeight={800}>
+                  {channelTitle}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  1.2M subscribers
+                </Typography>
+              </Box>
+              
+              <Stack direction="row" spacing={1}>
+                <IconButton 
+                  onClick={handlePrevious} 
+                  disabled={videoIndex === 0}
+                  sx={{ bgcolor: 'action.hover' }}
+                >
+                  <SkipPreviousIcon />
+                </IconButton>
+                <IconButton 
+                  onClick={handleNext} 
+                  disabled={videoIndex === playlistItems.length - 1}
+                  sx={{ bgcolor: 'action.hover' }}
+                >
+                  <SkipNextIcon />
+                </IconButton>
+              </Stack>
+
+              <Button variant="contained" sx={{ borderRadius: 50, px: 3, bgcolor: 'text.primary', color: 'background.paper', '&:hover': { bgcolor: 'text.secondary' } }}>
+                Subscribe
+              </Button>
+            </Stack>
+
+            <Stack direction="row" spacing={1} sx={{ width: { xs: '100%', sm: 'auto' }, justifyContent: 'flex-end' }}>
+              <Box sx={{ display: 'flex', bgcolor: 'action.hover', borderRadius: 50 }}>
+                <Button startIcon={<ThumbUpOutlinedIcon />} sx={{ px: 2, color: 'text.primary', textTransform: 'none' }}>12K</Button>
+                <Divider orientation="vertical" flexItem />
+                <Button sx={{ px: 2, color: 'text.primary' }}><ThumbDownOutlinedIcon /></Button>
+              </Box>
+
+              <IconButton onClick={toggleSidebar} sx={{ bgcolor: 'action.hover' }}>
+                <ViewSidebarOutlinedIcon />
+              </IconButton>
+            </Stack>
+          </Stack>
+
+          {/* Playback Speed Quick Actions */}
+          <Stack direction="row" spacing={1} sx={{ mb: 3, overflowX: 'auto', pb: 1 }}>
+            <Typography variant="caption" sx={{ alignSelf: 'center', mr: 1, color: 'text.secondary', fontWeight: 700 }}>SPEED</Typography>
+            {[0.5, 1, 1.25, 1.5, 2].map((speed) => (
+              <Button
+                key={speed}
+                size="small"
+                onClick={() => changeSpeed(speed)}
+                variant={playbackSpeed === speed ? "contained" : "outlined"}
+                sx={{ 
+                  minWidth: 50, 
+                  borderRadius: 2, 
+                  textTransform: 'none',
+                  fontWeight: 600
+                }}
+              >
+                {speed}x
+              </Button>
+            ))}
+          </Stack>
+
+          <Box sx={{ 
+            bgcolor: 'action.hover', 
+            p: 3, 
+            borderRadius: 4,
+          }}>
+            <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
+              {expanded ? videoDescription : videoDescription?.slice(0, 200) + "..."}
+            </Typography>
+            <Button size="small" onClick={() => setExpanded(!expanded)} sx={{ mt: 1, fontWeight: 700 }}>
+              {expanded ? "Show less" : "Show more"}
+            </Button>
+          </Box>
+        </Container>
+      )}
+
+      {/* Minimalistic Control Overlay for Zen Mode */}
+      {isZenMode && (
+        <Box 
+          sx={{ 
+            position: 'absolute', 
+            bottom: 30, 
+            right: 30, 
+            zIndex: 10,
+            opacity: 0,
+            transition: 'opacity 0.3s',
+            '&:hover': { opacity: 1 },
+            display: 'flex',
+            gap: 1
+          }}
+        >
+          <IconButton onClick={handlePrevious} disabled={videoIndex === 0} sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: '#fff', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)' } }}>
+            <SkipPreviousIcon />
+          </IconButton>
+          <IconButton onClick={handleNext} disabled={videoIndex === playlistItems.length - 1} sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: '#fff', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)' } }}>
+            <SkipNextIcon />
+          </IconButton>
+          <IconButton onClick={toggleSidebar} sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: '#fff', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)' } }}>
+            <ViewSidebarOutlinedIcon />
+          </IconButton>
         </Box>
-      </Container>
+      )}
     </Box>
   );
 };
