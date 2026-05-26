@@ -3,6 +3,7 @@ import { useParams, useOutletContext, useNavigate } from "react-router";
 import { useState, useEffect, useRef } from "react";
 import YouTube from "react-youtube";
 import useValidPlaylist from "../../hooks/useValidPlaylist.jsx";
+import { useStoreActions, useStoreState } from "easy-peasy";
 import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
 import ThumbDownOutlinedIcon from "@mui/icons-material/ThumbDownOutlined";
 import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
@@ -45,10 +46,14 @@ const VideoItem = ({ customContext }) => {
   
   const playerRef = useRef(null);
 
+  const updateProgress = useStoreActions((actions) => actions.progress.updateProgress);
+  const progressItems = useStoreState((state) => state.progress.items);
+
   const { title, videoDescription } =
     getVideoDetails(playlistId, videoId) || {};
 
   const [expanded, setExpanded] = useState(false);
+  const [isPlayerReady, setIsPlayerReady] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [hud, setHud] = useState({ visible: false, icon: null, text: "" });
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
@@ -101,22 +106,51 @@ const VideoItem = ({ customContext }) => {
     }
   }, [videoId, chapters.length]);
 
-  // Poll current time when video is playing
+  // Reset player ready state on video change
+  useEffect(() => {
+    setIsPlayerReady(false);
+  }, [videoId]);
+
+  // Find thumbnail for current video
+  const currentVideoItem = playlistItems?.find((item) => item.videoId === videoId);
+  const thumbnail = currentVideoItem?.thumbnail;
+
+  // Poll current time and save progress periodically when video is playing
   useEffect(() => {
     let interval;
-    if (playerRef.current) {
+    if (isPlayerReady && playerRef.current) {
       interval = setInterval(() => {
         try {
-          if (playerRef.current.getPlayerState() === 1) { // 1 is playing
-            setCurrentTime(playerRef.current.getCurrentTime());
+          const player = playerRef.current;
+          const playerState = player.getPlayerState();
+          
+          if (playerState === 1) { // 1 is playing
+            const time = player.getCurrentTime();
+            const dur = player.getDuration();
+            setCurrentTime(time);
+            
+            // Save progress to store
+            if (dur > 0) {
+              updateProgress({
+                videoId,
+                playlistId,
+                title,
+                channelTitle,
+                thumbnail,
+                currentTime: time,
+                duration: dur,
+              });
+            }
           }
         } catch (e) {
           // Player not fully initialized yet
         }
-      }, 1000);
+      }, 1500);
     }
-    return () => clearInterval(interval);
-  }, [videoId]);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [videoId, isPlayerReady, playlistId, title, channelTitle, thumbnail, updateProgress]);
 
   // Determine current active chapter index
   const getActiveChapterIndex = () => {
@@ -482,18 +516,51 @@ const VideoItem = ({ customContext }) => {
           }}
           onReady={(event) => {
             playerRef.current = event.target;
-            const savedTime = localStorage.getItem(`video-time-${videoId}`);
+            setIsPlayerReady(true);
+            const savedProgress = progressItems[videoId];
+            const savedTime = savedProgress?.currentTime || localStorage.getItem(`video-time-${videoId}`);
             if (savedTime) {
               event.target.seekTo(parseFloat(savedTime));
             }
           }}
           onStateChange={(event) => {
-            if (event.data === 1 || event.data === 2) {
-              const currentTime = event.target.getCurrentTime();
-              localStorage.setItem(`video-time-${videoId}`, currentTime);
-            }
-            if (event.data === 0) { // Video ended
-              handleNext();
+            try {
+              const player = event.target;
+              const playerState = event.data;
+              const time = player.getCurrentTime();
+              const dur = player.getDuration();
+              
+              if (playerState === 1 || playerState === 2) {
+                if (dur > 0) {
+                  updateProgress({
+                    videoId,
+                    playlistId,
+                    title,
+                    channelTitle,
+                    thumbnail,
+                    currentTime: time,
+                    duration: dur,
+                  });
+                }
+                localStorage.setItem(`video-time-${videoId}`, time);
+              }
+              
+              if (playerState === 0) { // Video ended
+                if (dur > 0) {
+                  updateProgress({
+                    videoId,
+                    playlistId,
+                    title,
+                    channelTitle,
+                    thumbnail,
+                    currentTime: dur,
+                    duration: dur,
+                  });
+                }
+                handleNext();
+              }
+            } catch (e) {
+              console.error(e);
             }
           }}
         />
