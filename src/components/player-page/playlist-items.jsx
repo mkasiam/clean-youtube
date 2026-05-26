@@ -9,6 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Link as RouterLink } from "react-router";
+import { useStoreState } from "easy-peasy";
 
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 
@@ -21,6 +22,9 @@ const PlaylistItems = ({
   compact = false,
   active = false,
 }) => {
+  const progressItems = useStoreState((state) => state.progress.items);
+  const progress = progressItems[item.videoId];
+  
   return (
     <Grid item xs={12}>
       <Link
@@ -64,7 +68,7 @@ const PlaylistItems = ({
           </Box>
 
           {/* Thumbnail */}
-          <Box sx={{ position: 'relative', flexShrink: 0 }}>
+          <Box sx={{ position: 'relative', flexShrink: 0, overflow: 'hidden', borderRadius: 2 }}>
             <CardMedia
               component="img"
               image={item.thumbnail.url}
@@ -73,9 +77,57 @@ const PlaylistItems = ({
                 width: 120,
                 height: 68,
                 objectFit: "cover",
-                borderRadius: 2,
+                display: 'block'
               }}
             />
+            
+            {/* Completed Badge */}
+            {progress?.completed && (
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: 2,
+                  right: 2,
+                  bgcolor: 'success.main',
+                  color: '#fff',
+                  fontSize: '0.6rem',
+                  fontWeight: 900,
+                  px: 0.5,
+                  py: 0.1,
+                  borderRadius: 0.5,
+                  textTransform: 'uppercase',
+                  letterSpacing: 0.5,
+                  zIndex: 2,
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
+                }}
+              >
+                Completed
+              </Box>
+            )}
+
+            {/* Progress Bar */}
+            {progress && progress.percentage > 0 && (
+              <Box
+                sx={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  width: '100%',
+                  height: 4,
+                  bgcolor: 'rgba(0, 0, 0, 0.4)',
+                  overflow: 'hidden',
+                  zIndex: 2
+                }}
+              >
+                <Box
+                  sx={{
+                    width: `${progress.percentage}%`,
+                    height: '100%',
+                    bgcolor: 'primary.main',
+                  }}
+                />
+              </Box>
+            )}
           </Box>
 
           {/* Details */}
